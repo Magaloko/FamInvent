@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useFamily } from '@/lib/FamilyContext'
-import { getFamilyStats, getTopToys, getPlayLogs } from '@/lib/api'
+import { getStats, getTopToys, getPlayLogs } from '@/lib/api'
 import { LABELS, CHART_COLORS } from '@/lib/constants'
 import { Package, FolderOpen, Euro, Clock, Plus, Gamepad2, BarChart3 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 export default function Dashboard() {
-  const { family } = useFamily()
   const [stats, setStats] = useState(null)
   const [topToys, setTopToys] = useState([])
   const [recentLogs, setRecentLogs] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!family) return
     async function load() {
       setLoading(true)
       const [statsRes, toysRes, logsRes] = await Promise.all([
-        getFamilyStats(family.id),
-        getTopToys(family.id),
-        getPlayLogs({ familyId: family.id, limit: 5 }),
+        getStats(),
+        getTopToys(),
+        getPlayLogs({ limit: 5 }),
       ])
       setStats(statsRes.data)
       setTopToys(toysRes.data || [])
@@ -28,7 +25,7 @@ export default function Dashboard() {
       setLoading(false)
     }
     load()
-  }, [family])
+  }, [])
 
   if (loading) {
     return (
@@ -167,11 +164,10 @@ export default function Dashboard() {
           <div className="space-y-2">
             {recentLogs.map((log) => (
               <div key={log.id} className="flex items-center gap-3 py-2 border-b border-fm-border last:border-0">
-                <span className="text-lg">{log.fm_members?.avatar_url || '👤'}</span>
+                <span className="text-lg">🎮</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-fm-text">
-                    <strong>{log.fm_members?.name || 'Unbekannt'}</strong> hat mit{' '}
-                    <strong>{log.fm_items?.name || '...'}</strong> gespielt
+                    Mit <strong>{log.fm_items?.name || '...'}</strong> gespielt
                   </p>
                   <p className="text-xs text-fm-text-muted">
                     {new Date(log.played_at).toLocaleDateString('de-DE', {

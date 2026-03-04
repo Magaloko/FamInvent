@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { useFamily } from '@/lib/FamilyContext'
 import { getCollections, createCollection, getCollectionValue } from '@/lib/api'
 import { LABELS, COLLECTION_ICONS } from '@/lib/constants'
 import { Plus, FolderOpen, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Collections() {
-  const { family } = useFamily()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [collections, setCollections] = useState([])
@@ -24,13 +22,12 @@ export default function Collections() {
 
   useEffect(() => {
     loadCollections()
-  }, [family, filter])
+  }, [filter])
 
   async function loadCollections() {
-    if (!family) return
     setLoading(true)
     const opts = filter !== 'all' ? { type: filter } : {}
-    const { data } = await getCollections(family.id, opts)
+    const { data } = await getCollections(opts)
     setCollections(data || [])
 
     // Load values for each collection
@@ -51,7 +48,6 @@ export default function Collections() {
 
     setSaving(true)
     const { data, error } = await createCollection({
-      family_id: family.id,
       name: newName.trim(),
       type: newType,
       icon: newIcon,

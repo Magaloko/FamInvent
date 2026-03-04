@@ -1,19 +1,15 @@
 import { NavLink } from 'react-router-dom'
-import { useFamily } from '@/lib/FamilyContext'
 import { LABELS } from '@/lib/constants'
-import { LayoutDashboard, FolderOpen, Gamepad2, BarChart3, Users, X } from 'lucide-react'
+import { LayoutDashboard, FolderOpen, Gamepad2, BarChart3, X } from 'lucide-react'
 
 const NAV_ITEMS = [
   { to: '/', icon: LayoutDashboard, label: LABELS.dashboard },
   { to: '/collections', icon: FolderOpen, label: LABELS.collections },
   { to: '/playlog', icon: Gamepad2, label: LABELS.playLog },
   { to: '/statistics', icon: BarChart3, label: LABELS.statistics },
-  { to: '/family', icon: Users, label: LABELS.family },
 ]
 
 export default function Sidebar({ open, onClose }) {
-  const { family } = useFamily()
-
   return (
     <>
       {/* Mobile overlay */}
@@ -31,14 +27,9 @@ export default function Sidebar({ open, onClose }) {
       >
         {/* Logo area */}
         <div className="px-6 h-14 flex items-center justify-between border-b border-fm-border">
-          <div>
-            <h2 className="font-heading font-bold text-fm-text text-lg">
-              {LABELS.appName}
-            </h2>
-            {family && (
-              <p className="text-xs text-fm-text-muted -mt-0.5">{family.name}</p>
-            )}
-          </div>
+          <h2 className="font-heading font-bold text-fm-text text-lg">
+            {LABELS.appName}
+          </h2>
           <button onClick={onClose} className="lg:hidden fm-btn-ghost p-1">
             <X size={18} />
           </button>

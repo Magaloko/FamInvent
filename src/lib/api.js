@@ -1,115 +1,15 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 
-// ── Families ───────────────────────────────────────
-
-export async function createFamily(name) {
-  if (!isSupabaseConfigured) return { data: null, error: 'Nicht konfiguriert' }
-
-  const { data, error } = await supabase
-    .from('fm_families')
-    .insert({ name })
-    .select()
-    .single()
-
-  return { data, error: error?.message }
-}
-
-export async function getFamily(userId) {
-  if (!isSupabaseConfigured) return { data: null, error: null }
-
-  const { data: member } = await supabase
-    .from('fm_members')
-    .select('family_id')
-    .eq('id', userId)
-    .single()
-
-  if (!member) return { data: null, error: null }
-
-  const { data, error } = await supabase
-    .from('fm_families')
-    .select('*')
-    .eq('id', member.family_id)
-    .single()
-
-  return { data, error: error?.message }
-}
-
-export async function updateFamily(familyId, updates) {
-  if (!isSupabaseConfigured) return { data: null, error: 'Nicht konfiguriert' }
-
-  const { data, error } = await supabase
-    .from('fm_families')
-    .update(updates)
-    .eq('id', familyId)
-    .select()
-    .single()
-
-  return { data, error: error?.message }
-}
-
-// ── Members ────────────────────────────────────────
-
-export async function getMembers(familyId) {
-  if (!isSupabaseConfigured) return { data: [], error: null }
-
-  const { data, error } = await supabase
-    .from('fm_members')
-    .select('*')
-    .eq('family_id', familyId)
-    .order('role', { ascending: true })
-    .order('created_at', { ascending: true })
-
-  return { data: data || [], error: error?.message }
-}
-
-export async function createMember(member) {
-  if (!isSupabaseConfigured) return { data: null, error: 'Nicht konfiguriert' }
-
-  const { data, error } = await supabase
-    .from('fm_members')
-    .insert(member)
-    .select()
-    .single()
-
-  return { data, error: error?.message }
-}
-
-export async function updateMember(id, updates) {
-  if (!isSupabaseConfigured) return { data: null, error: 'Nicht konfiguriert' }
-
-  const { data, error } = await supabase
-    .from('fm_members')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single()
-
-  return { data, error: error?.message }
-}
-
-export async function deleteMember(id) {
-  if (!isSupabaseConfigured) return { error: 'Nicht konfiguriert' }
-
-  const { error } = await supabase
-    .from('fm_members')
-    .delete()
-    .eq('id', id)
-
-  return { error: error?.message }
-}
-
 // ── Collections ────────────────────────────────────
 
-export async function getCollections(familyId, { ownerId, type } = {}) {
+export async function getCollections({ type } = {}) {
   if (!isSupabaseConfigured) return { data: [], error: null }
 
   let query = supabase
     .from('fm_collections')
     .select('*, fm_items(count)')
-    .eq('family_id', familyId)
     .order('created_at', { ascending: false })
 
-  if (ownerId) query = query.eq('owner_id', ownerId)
   if (type) query = query.eq('type', type)
 
   const { data, error } = await query
@@ -194,7 +94,7 @@ export async function getItem(id) {
 
   const { data, error } = await supabase
     .from('fm_items')
-    .select('*, fm_collections(name, type, family_id, icon)')
+    .select('*, fm_collections(name, type, icon)')
     .eq('id', id)
     .single()
 
@@ -237,58 +137,37 @@ export async function deleteItem(id) {
   return { error: error?.message }
 }
 
-export async function getItemsByFamily(familyId) {
+export async function getAllToyItems() {
   if (!isSupabaseConfigured) return { data: [], error: null }
 
   const { data: collections } = await supabase
     .from('fm_collections')
     .select('id')
-    .eq('family_id', familyId)
+    .eq('type', 'toy')
 
   if (!collections?.length) return { data: [], error: null }
 
-  const ids = collections.map((c) => c.id)
-
   const { data, error } = await supabase
     .from('fm_items')
-    .select('*, fm_collections(name, type, icon)')
-    .in('collection_id', ids)
-    .order('created_at', { ascending: false })
+    .select('id, name, image_url, collection_id')
+    .in('collection_id', collections.map((c) => c.id))
+    .order('name')
 
   return { data: data || [], error: error?.message }
 }
 
 // ── Play Logs ──────────────────────────────────────
 
-export async function getPlayLogs({ familyId, itemId, memberId, limit = 50 } = {}) {
+export async function getPlayLogs({ itemId, limit = 50 } = {}) {
   if (!isSupabaseConfigured) return { data: [], error: null }
 
   let query = supabase
     .from('fm_play_logs')
-    .select('*, fm_items(name, image_url, collection_id), fm_members(name, avatar_url)')
+    .select('*, fm_items(name, image_url, collection_id)')
     .order('played_at', { ascending: false })
 
   if (itemId) query = query.eq('item_id', itemId)
-  if (memberId) query = query.eq('played_by', memberId)
   if (limit) query = query.limit(limit)
-
-  if (familyId && !itemId) {
-    const { data: collections } = await supabase
-      .from('fm_collections')
-      .select('id')
-      .eq('family_id', familyId)
-
-    if (!collections?.length) return { data: [], error: null }
-
-    const { data: items } = await supabase
-      .from('fm_items')
-      .select('id')
-      .in('collection_id', collections.map((c) => c.id))
-
-    if (!items?.length) return { data: [], error: null }
-
-    query = query.in('item_id', items.map((i) => i.id))
-  }
 
   const { data, error } = await query
 
@@ -320,13 +199,12 @@ export async function deletePlayLog(id) {
 
 // ── Statistics ─────────────────────────────────────
 
-export async function getTopToys(familyId, { memberId, limit = 5 } = {}) {
+export async function getTopToys({ limit = 5 } = {}) {
   if (!isSupabaseConfigured) return { data: [], error: null }
 
   const { data: collections } = await supabase
     .from('fm_collections')
     .select('id')
-    .eq('family_id', familyId)
     .eq('type', 'toy')
 
   if (!collections?.length) return { data: [], error: null }
@@ -338,14 +216,10 @@ export async function getTopToys(familyId, { memberId, limit = 5 } = {}) {
 
   if (!items?.length) return { data: [], error: null }
 
-  let logQuery = supabase
+  const { data: logs } = await supabase
     .from('fm_play_logs')
     .select('item_id, played_at')
     .in('item_id', items.map((i) => i.id))
-
-  if (memberId) logQuery = logQuery.eq('played_by', memberId)
-
-  const { data: logs } = await logQuery
 
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -376,7 +250,7 @@ export async function getTopToys(familyId, { memberId, limit = 5 } = {}) {
   return { data: ranked, error: null }
 }
 
-export async function getFamilyStats(familyId) {
+export async function getStats() {
   if (!isSupabaseConfigured) {
     return {
       data: { totalItems: 0, totalCollections: 0, totalValue: 0, totalPlayMinutes: 0 },
@@ -387,11 +261,10 @@ export async function getFamilyStats(familyId) {
   const { data: collections } = await supabase
     .from('fm_collections')
     .select('id, name, type, icon')
-    .eq('family_id', familyId)
 
   if (!collections?.length) {
     return {
-      data: { totalItems: 0, totalCollections: collections?.length || 0, totalValue: 0, totalPlayMinutes: 0 },
+      data: { totalItems: 0, totalCollections: 0, totalValue: 0, totalPlayMinutes: 0 },
       error: null,
     }
   }
