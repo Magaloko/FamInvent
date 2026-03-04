@@ -1,47 +1,35 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { LABELS } from '@/lib/constants'
-import { LayoutDashboard, FolderOpen, PlusCircle, Gamepad2, BarChart3 } from 'lucide-react'
+import { NavLink, useLocation } from 'react-router-dom'
+import { LayoutDashboard, FolderOpen, ShoppingCart, ClipboardList, MoreHorizontal } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { to: '/', icon: LayoutDashboard, label: LABELS.dashboard },
-  { to: '/collections', icon: FolderOpen, label: LABELS.collections },
-  { to: null, icon: PlusCircle, label: LABELS.add, isCenter: true },
-  { to: '/playlog', icon: Gamepad2, label: 'Spiel' },
-  { to: '/statistics', icon: BarChart3, label: 'Stats' },
+  { to: '/', icon: LayoutDashboard, label: 'Home', end: true },
+  { to: '/collections', icon: FolderOpen, label: 'Inventar' },
+  { to: '/handel', icon: ShoppingCart, label: 'Handel' },
+  { to: '/tracker', icon: ClipboardList, label: 'Tracker' },
+  { to: '/more', icon: MoreHorizontal, label: 'Mehr' },
 ]
 
 export default function BottomNav() {
-  const navigate = useNavigate()
+  const location = useLocation()
+
+  const moreActive = ['/playlog', '/statistics', '/more'].some((p) => location.pathname.startsWith(p))
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-fm-border lg:hidden">
-      <div className="flex items-center justify-around h-16 px-2 pb-safe">
-        {NAV_ITEMS.map((item, i) => {
-          if (item.isCenter) {
-            return (
-              <button
-                key={i}
-                onClick={() => navigate('/collections?new=1')}
-                className="flex flex-col items-center justify-center -mt-4"
-              >
-                <div className="w-12 h-12 rounded-full bg-fm-primary flex items-center justify-center shadow-btn">
-                  <PlusCircle size={24} className="text-white" />
-                </div>
-              </button>
-            )
-          }
-
+    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-fm-border lg:hidden">
+      <div className="flex items-center justify-around h-16 px-1 pb-safe">
+        {NAV_ITEMS.map((item) => {
+          const isMore = item.to === '/more'
           return (
             <NavLink
               key={item.to}
-              to={item.to}
-              end={item.to === '/'}
+              to={isMore ? '/more' : item.to}
+              end={item.end}
               className={({ isActive }) =>
-                `fm-nav-item ${isActive ? 'active' : ''}`
+                `fm-nav-item ${(isMore ? moreActive : isActive) ? 'active' : ''}`
               }
             >
-              <item.icon size={20} />
-              <span>{item.label}</span>
+              <item.icon size={22} strokeWidth={1.8} />
+              <span className="text-[10px]">{item.label}</span>
             </NavLink>
           )
         })}

@@ -5,23 +5,31 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
     font-family: 'Inter', sans-serif;
     background-color: #FFF8F0;
     color: #3E2723;
     min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
+    overscroll-behavior: none;
+  }
+  /* Safe area for iOS notch / home indicator */
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 
 @layer components {
   .fm-btn {
-    @apply inline-flex items-center justify-center gap-2 font-heading font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 font-heading font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed select-none;
   }
 
   .fm-btn-primary {
-    @apply fm-btn px-6 py-3 text-white rounded-btn;
+    @apply fm-btn px-6 py-3 text-white rounded-btn active:scale-95;
     background-color: #FF8A65;
     box-shadow: 0 4px 12px rgba(255, 138, 101, 0.3);
   }
@@ -31,7 +39,7 @@
   }
 
   .fm-btn-secondary {
-    @apply fm-btn px-6 py-3 rounded-btn border-2;
+    @apply fm-btn px-6 py-3 rounded-btn border-2 active:scale-95;
     color: #FF8A65;
     border-color: #FF8A65;
     background: transparent;
@@ -51,7 +59,7 @@
   }
 
   .fm-btn-danger {
-    @apply fm-btn px-6 py-3 text-white rounded-btn;
+    @apply fm-btn px-6 py-3 text-white rounded-btn active:scale-95;
     background-color: #EF5350;
   }
   .fm-btn-danger:hover:not(:disabled) {
@@ -59,7 +67,7 @@
   }
 
   .fm-card {
-    @apply transition-all duration-200 cursor-pointer;
+    @apply transition-all duration-200 cursor-pointer active:scale-[0.98];
     background-color: white;
     border: 1px solid #F5E6D8;
     border-radius: 16px;
@@ -82,6 +90,7 @@
     background-color: #FFF3E8;
     border: 2px solid #F5E6D8;
     color: #3E2723;
+    -webkit-appearance: none;
   }
   .fm-input:focus {
     outline: none;
@@ -109,16 +118,30 @@
     @apply p-5 fm-card-static;
   }
 
+  /* Bottom Navigation */
   .fm-nav-item {
-    @apply flex flex-col items-center gap-1 px-3 py-2 text-xs font-heading font-medium transition-colors;
+    @apply flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-heading font-medium transition-colors relative select-none;
     color: #BCAAA4;
+    -webkit-tap-highlight-color: transparent;
   }
   .fm-nav-item.active {
     color: #FF8A65;
   }
+  .fm-nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 3px;
+    background-color: #FF8A65;
+    border-radius: 0 0 4px 4px;
+  }
 
+  /* Sidebar */
   .fm-sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-btn text-sm font-heading font-medium transition-all duration-200;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm font-heading font-medium transition-all duration-200;
     color: #8D6E63;
   }
   .fm-sidebar-link:hover {
@@ -141,6 +164,7 @@
   }
 }
 
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -153,4 +177,9 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #BCAAA4;
+}
+
+/* iOS safe areas for bottom nav */
+.pb-safe {
+  padding-bottom: max(8px, var(--safe-bottom));
 }

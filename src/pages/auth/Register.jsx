@@ -32,7 +32,7 @@ export default function Register() {
     if (error) {
       setError(error.message || 'Registrierung fehlgeschlagen')
     } else {
-      navigate('/setup')
+      navigate('/')
     }
     setLoading(false)
   }

@@ -19,6 +19,7 @@ import TrackerDashboard from './pages/tracker/TrackerDashboard'
 import TrackerListe from './pages/tracker/TrackerListe'
 import TrackerDetail from './pages/tracker/TrackerDetail'
 import TrackerMaterialien from './pages/tracker/TrackerMaterialien'
+import More from './pages/More'
 
 function AuthRoute({ children }) {
   const { user, loading } = useAuth()
@@ -69,6 +70,7 @@ function AppRoutes() {
         <Route path="tracker/liste" element={<TrackerListe />} />
         <Route path="tracker/:id" element={<TrackerDetail />} />
         <Route path="tracker/:id/materialien" element={<TrackerMaterialien />} />
+        <Route path="more" element={<More />} />
       </Route>
 
       {/* 404 */}

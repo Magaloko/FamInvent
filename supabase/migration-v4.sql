@@ -6,7 +6,7 @@
 
 CREATE TABLE fm_trackers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
   name TEXT NOT NULL,
   icon TEXT DEFAULT '📊',
   color TEXT DEFAULT '#FF8A65',
@@ -38,7 +38,7 @@ CREATE POLICY "Users manage own trackers"
 
 CREATE TABLE fm_tracker_entries (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
   tracker_id UUID REFERENCES fm_trackers(id) ON DELETE CASCADE NOT NULL,
   date DATE NOT NULL DEFAULT CURRENT_DATE,
   count NUMERIC(10,2) DEFAULT 0,
@@ -66,7 +66,7 @@ CREATE POLICY "Users manage own tracker entries"
 
 CREATE TABLE fm_smoking_materials (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
   tracker_id UUID REFERENCES fm_trackers(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
   package_amount NUMERIC(10,2) NOT NULL DEFAULT 1,
