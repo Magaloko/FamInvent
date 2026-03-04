@@ -80,6 +80,25 @@ export const LABELS = {
   loading: 'Laden...',
   error: 'Fehler',
   success: 'Erfolgreich',
+  // New labels for extended item fields
+  location: 'Standort',
+  borrowedTo: 'Ausgeborgt an',
+  acquiredType: 'Herkunft',
+  bought: 'Gekauft',
+  gifted: 'Geschenkt',
+  store: 'Geschäft / Laden',
+  giftedFrom: 'Geschenkt von',
+  occasion: 'Anlass',
+  acquiredDate: 'Kaufdatum',
+  receipt: 'Rechnung',
+  uploadReceipt: 'Rechnung hochladen',
+  viewReceipt: 'Rechnung ansehen',
+  imageUrl: 'Bild-URL',
+  orUrl: 'oder URL einfügen',
+  moreDetails: 'Weitere Details',
+  hideDetails: 'Details ausblenden',
+  noOccasion: 'Kein bestimmter Anlass',
+  acquiredInfo: 'Herkunft & Kauf',
 }
 
 export const CATEGORIES = [
@@ -96,13 +115,39 @@ export const CATEGORIES = [
   { id: 'figuren', name: 'Figuren', icon: '🦸' },
   { id: 'musik', name: 'Musik', icon: '🎵' },
   { id: 'kunst', name: 'Kunst', icon: '🎨' },
+  { id: 'cd', name: 'CDs', icon: '💿' },
+  { id: 'dvd', name: 'DVDs', icon: '📀' },
+  { id: 'ps5', name: 'PS5 Spiele', icon: '🎮' },
+  { id: 'ps4', name: 'PS4 Spiele', icon: '🕹️' },
+  { id: 'videospiele', name: 'Videospiele', icon: '👾' },
+  { id: 'schmuck', name: 'Schmuck', icon: '💍' },
+  { id: 'werkzeug', name: 'Werkzeug', icon: '🔧' },
+  { id: 'outdoor', name: 'Outdoor', icon: '🏕️' },
   { id: 'sonstiges', name: 'Sonstiges', icon: '📦' },
+]
+
+export const LOCATIONS = [
+  { id: 'zuhause', name: 'Zuhause', icon: '🏠' },
+  { id: 'keller', name: 'Keller', icon: '📦' },
+  { id: 'dachboden', name: 'Dachboden', icon: '🏚️' },
+  { id: 'garage', name: 'Garage', icon: '🚗' },
+  { id: 'ausgeborgt', name: 'Ausgeborgt', icon: '🔄' },
+]
+
+export const OCCASIONS = [
+  { id: 'geburtstag', name: 'Geburtstag', icon: '🎂' },
+  { id: 'weihnachten', name: 'Weihnachten', icon: '🎄' },
+  { id: 'ramadan', name: 'Ramadan', icon: '🌙' },
+  { id: 'eid', name: 'Eid', icon: '🕌' },
+  { id: 'ostern', name: 'Ostern', icon: '🐰' },
+  { id: 'sonstiges', name: 'Sonstiger Anlass', icon: '🎁' },
 ]
 
 export const COLLECTION_ICONS = [
   '👟', '🚗', '🧩', '🧸', '🧱', '📚', '👗', '⚽', '🎮', '📦',
   '🎨', '🎵', '🌿', '🏠', '💎', '🎁', '🧳', '🔧', '🎲', '🪀',
   '🎸', '🎪', '🦸', '🐻', '🌟', '🚀', '🎯', '🏆', '💡', '🧪',
+  '💿', '📀', '🕹️', '👾', '💍', '🏕️',
 ]
 
 export const AVATARS = [
