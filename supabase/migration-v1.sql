@@ -4,18 +4,88 @@
 -- All tables prefixed with fm_ to avoid conflicts
 -- with existing vintage-market tables.
 -- Safe to run multiple times (IF NOT EXISTS).
+--
+-- STRUCTURE: All tables created first, then all
+-- RLS policies applied (avoids circular refs).
 -- ============================================
 
--- =====================
--- 1. FM_FAMILIES
--- =====================
+-- ═══════════════════════════════════════════
+-- PART 1: CREATE ALL TABLES
+-- ═══════════════════════════════════════════
+
 CREATE TABLE IF NOT EXISTS fm_families (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS fm_members (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  family_id UUID NOT NULL REFERENCES fm_families(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'child' CHECK (role IN ('parent', 'child')),
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS fm_collections (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  family_id UUID NOT NULL REFERENCES fm_families(id) ON DELETE CASCADE,
+  owner_id UUID REFERENCES fm_members(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'normal' CHECK (type IN ('normal', 'toy')),
+  icon TEXT DEFAULT '📦',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS fm_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  collection_id UUID NOT NULL REFERENCES fm_collections(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  value NUMERIC(10,2) DEFAULT 0,
+  image_url TEXT,
+  category TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS fm_play_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  item_id UUID NOT NULL REFERENCES fm_items(id) ON DELETE CASCADE,
+  played_by UUID REFERENCES fm_members(id) ON DELETE SET NULL,
+  played_at TIMESTAMPTZ DEFAULT NOW(),
+  duration_minutes INTEGER,
+  notes TEXT DEFAULT ''
+);
+
+-- ═══════════════════════════════════════════
+-- PART 2: INDEXES
+-- ═══════════════════════════════════════════
+
+CREATE INDEX IF NOT EXISTS idx_fm_members_family ON fm_members(family_id);
+CREATE INDEX IF NOT EXISTS idx_fm_collections_family ON fm_collections(family_id);
+CREATE INDEX IF NOT EXISTS idx_fm_collections_owner ON fm_collections(owner_id);
+CREATE INDEX IF NOT EXISTS idx_fm_items_collection ON fm_items(collection_id);
+CREATE INDEX IF NOT EXISTS idx_fm_items_category ON fm_items(category);
+CREATE INDEX IF NOT EXISTS idx_fm_play_logs_item ON fm_play_logs(item_id);
+CREATE INDEX IF NOT EXISTS idx_fm_play_logs_played_at ON fm_play_logs(played_at DESC);
+CREATE INDEX IF NOT EXISTS idx_fm_play_logs_played_by ON fm_play_logs(played_by);
+
+-- ═══════════════════════════════════════════
+-- PART 3: ENABLE RLS ON ALL TABLES
+-- ═══════════════════════════════════════════
+
 ALTER TABLE fm_families ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fm_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fm_collections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fm_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fm_play_logs ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════════════════════════════
+-- PART 4: RLS POLICIES (all tables exist now)
+-- ═══════════════════════════════════════════
+
+-- ── fm_families policies ───────────────────
 
 DO $$ BEGIN
   CREATE POLICY "Auth users can create families"
@@ -46,21 +116,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- =====================
--- 2. FM_MEMBERS
--- =====================
-CREATE TABLE IF NOT EXISTS fm_members (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  family_id UUID NOT NULL REFERENCES fm_families(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'child' CHECK (role IN ('parent', 'child')),
-  avatar_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_fm_members_family ON fm_members(family_id);
-
-ALTER TABLE fm_members ENABLE ROW LEVEL SECURITY;
+-- ── fm_members policies ────────────────────
 
 DO $$ BEGIN
   CREATE POLICY "Family members can view members"
@@ -102,23 +158,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- =====================
--- 3. FM_COLLECTIONS
--- =====================
-CREATE TABLE IF NOT EXISTS fm_collections (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  family_id UUID NOT NULL REFERENCES fm_families(id) ON DELETE CASCADE,
-  owner_id UUID REFERENCES fm_members(id) ON DELETE SET NULL,
-  name TEXT NOT NULL,
-  type TEXT NOT NULL DEFAULT 'normal' CHECK (type IN ('normal', 'toy')),
-  icon TEXT DEFAULT '📦',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_fm_collections_family ON fm_collections(family_id);
-CREATE INDEX IF NOT EXISTS idx_fm_collections_owner ON fm_collections(owner_id);
-
-ALTER TABLE fm_collections ENABLE ROW LEVEL SECURITY;
+-- ── fm_collections policies ────────────────
 
 DO $$ BEGIN
   CREATE POLICY "Family members can view collections"
@@ -164,24 +204,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- =====================
--- 4. FM_ITEMS
--- =====================
-CREATE TABLE IF NOT EXISTS fm_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  collection_id UUID NOT NULL REFERENCES fm_collections(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  description TEXT DEFAULT '',
-  value NUMERIC(10,2) DEFAULT 0,
-  image_url TEXT,
-  category TEXT DEFAULT '',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_fm_items_collection ON fm_items(collection_id);
-CREATE INDEX IF NOT EXISTS idx_fm_items_category ON fm_items(category);
-
-ALTER TABLE fm_items ENABLE ROW LEVEL SECURITY;
+-- ── fm_items policies ──────────────────────
 
 DO $$ BEGIN
   CREATE POLICY "Family members can view items"
@@ -235,23 +258,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- =====================
--- 5. FM_PLAY_LOGS
--- =====================
-CREATE TABLE IF NOT EXISTS fm_play_logs (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  item_id UUID NOT NULL REFERENCES fm_items(id) ON DELETE CASCADE,
-  played_by UUID REFERENCES fm_members(id) ON DELETE SET NULL,
-  played_at TIMESTAMPTZ DEFAULT NOW(),
-  duration_minutes INTEGER,
-  notes TEXT DEFAULT ''
-);
-
-CREATE INDEX IF NOT EXISTS idx_fm_play_logs_item ON fm_play_logs(item_id);
-CREATE INDEX IF NOT EXISTS idx_fm_play_logs_played_at ON fm_play_logs(played_at DESC);
-CREATE INDEX IF NOT EXISTS idx_fm_play_logs_played_by ON fm_play_logs(played_by);
-
-ALTER TABLE fm_play_logs ENABLE ROW LEVEL SECURITY;
+-- ── fm_play_logs policies ──────────────────
 
 DO $$ BEGIN
   CREATE POLICY "Family members can view play logs"
@@ -295,9 +302,9 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- =====================
+-- ═══════════════════════════════════════════
 -- STORAGE BUCKET SETUP
--- =====================
+-- ═══════════════════════════════════════════
 -- Create bucket 'family-items' manually in Supabase Dashboard > Storage:
 -- Name: family-items
 -- Public: true
