@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getItem, updateItem, deleteItem, getPlayLogs, createPlayLog } from '@/lib/api'
 import { LABELS, CATEGORIES, LOCATIONS, OCCASIONS } from '@/lib/constants'
 import { uploadImage, uploadReceipt, createPreview } from '@/lib/storage'
-import { ArrowLeft, Trash2, Save, Gamepad2, Plus, Clock, Calendar, Upload, MapPin, Gift, ShoppingCart, FileText, ExternalLink, X } from 'lucide-react'
+import { ArrowLeft, Trash2, Save, Gamepad2, Plus, Clock, Calendar, Upload, MapPin, Gift, ShoppingCart, FileText, ExternalLink, X, Link } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function ItemPage() {
@@ -29,6 +29,8 @@ export default function ItemPage() {
   // Photo upload
   const photoInputRef = useRef(null)
   const receiptInputRef = useRef(null)
+  const [photoMode, setPhotoMode] = useState('upload') // 'upload' | 'url'
+  const [photoUrl, setPhotoUrl] = useState('')
 
   // Play form
   const [showPlayForm, setShowPlayForm] = useState(false)
@@ -95,6 +97,14 @@ export default function ItemPage() {
     else { toast.success('Foto entfernt'); loadData() }
   }
 
+  async function handlePhotoUrlSave() {
+    const url = photoUrl.trim()
+    if (!url) return
+    const { error } = await updateItem(id, { image_url: url })
+    if (error) toast.error(error)
+    else { toast.success('Foto gespeichert!'); setPhotoUrl(''); loadData() }
+  }
+
   async function handleReceiptUpload(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -141,15 +151,41 @@ export default function ItemPage() {
               <span className="text-8xl">{cat?.icon || '📦'}</span>
             )}
           </div>
-          <div className="p-3 flex gap-2 justify-center">
+          <div className="p-3 space-y-2">
             <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-            <button onClick={() => photoInputRef.current?.click()} className="fm-btn-ghost text-xs">
-              <Upload size={14} /> {item.image_url ? LABELS.changePhoto : LABELS.uploadPhoto}
-            </button>
-            {item.image_url && (
-              <button onClick={handleRemovePhoto} className="fm-btn-ghost text-xs text-red-400">
-                <X size={14} /> {LABELS.removePhoto}
+            {/* Toggle: Upload / URL */}
+            <div className="flex justify-center gap-1 bg-fm-bg-input rounded-btn p-0.5">
+              <button type="button" onClick={() => setPhotoMode('upload')} className={`flex-1 py-1.5 text-xs rounded-btn font-medium transition-all flex items-center justify-center gap-1 ${photoMode === 'upload' ? 'bg-white text-fm-primary shadow-sm' : 'text-fm-text-muted'}`}>
+                <Upload size={12} /> Datei
               </button>
+              <button type="button" onClick={() => setPhotoMode('url')} className={`flex-1 py-1.5 text-xs rounded-btn font-medium transition-all flex items-center justify-center gap-1 ${photoMode === 'url' ? 'bg-white text-fm-primary shadow-sm' : 'text-fm-text-muted'}`}>
+                <Link size={12} /> URL
+              </button>
+            </div>
+
+            {photoMode === 'upload' ? (
+              <div className="flex gap-2 justify-center">
+                <button onClick={() => photoInputRef.current?.click()} className="fm-btn-ghost text-xs">
+                  <Upload size={14} /> {item.image_url ? LABELS.changePhoto : LABELS.uploadPhoto}
+                </button>
+                {item.image_url && (
+                  <button onClick={handleRemovePhoto} className="fm-btn-ghost text-xs text-red-400">
+                    <X size={14} /> {LABELS.removePhoto}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input type="url" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} className="fm-input flex-1 text-xs" placeholder={LABELS.photoUrlPlaceholder} />
+                <button onClick={handlePhotoUrlSave} disabled={!photoUrl.trim()} className="fm-btn-primary text-xs disabled:opacity-50">
+                  {LABELS.saveUrl}
+                </button>
+                {item.image_url && (
+                  <button onClick={handleRemovePhoto} className="fm-btn-ghost text-xs text-red-400 px-2">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>

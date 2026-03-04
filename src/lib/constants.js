@@ -1,12 +1,11 @@
 export const LABELS = {
   appName: 'FamInventar',
   dashboard: 'Übersicht',
-  collections: 'Sammlungen',
+  collections: 'Inventar',
   newItem: 'Neues Teil',
-  newCollection: 'Neue Sammlung',
+  newCollection: 'Neue Kategorie',
   playLog: 'Spielprotokoll',
   statistics: 'Statistik',
-  family: 'Familie',
   settings: 'Einstellungen',
   login: 'Anmelden',
   register: 'Registrieren',
@@ -20,11 +19,11 @@ export const LABELS = {
   value: 'Wert',
   totalValue: 'Gesamtwert',
   noItems: 'Noch keine Teile vorhanden',
-  noCollections: 'Noch keine Sammlungen vorhanden',
+  noCollections: 'Noch keine Kategorien vorhanden',
   noPlayLogs: 'Noch keine Spielsitzungen erfasst',
   items: 'Teile',
   item: 'Teil',
-  collection: 'Sammlung',
+  collection: 'Kategorie',
   name: 'Name',
   description: 'Beschreibung',
   category: 'Kategorie',
@@ -32,18 +31,11 @@ export const LABELS = {
   type: 'Typ',
   normal: 'Normal',
   toy: 'Spielzeug',
-  parent: 'Elternteil',
-  child: 'Kind',
-  familyName: 'Familienname',
-  memberName: 'Name',
-  role: 'Rolle',
-  addMember: 'Mitglied hinzufügen',
   topToys: 'Top 5 Lieblingsspielzeuge',
   playSession: 'Spielsitzung',
   logPlay: 'Spiel eintragen',
   duration: 'Dauer (Minuten)',
   notes: 'Notizen',
-  allMembers: 'Alle Mitglieder',
   all: 'Alle',
   email: 'E-Mail',
   password: 'Passwort',
@@ -51,21 +43,19 @@ export const LABELS = {
   noAccount: 'Noch kein Konto?',
   hasAccount: 'Bereits ein Konto?',
   welcome: 'Willkommen!',
-  setupFamily: 'Familie einrichten',
-  step: 'Schritt',
   next: 'Weiter',
   back: 'Zurück',
   finish: 'Fertig',
   totalItems: 'Gesamte Teile',
-  totalCollections: 'Sammlungen',
+  totalCollections: 'Kategorien',
   playHours: 'Spielstunden',
   recentActivity: 'Letzte Aktivitäten',
-  valueByCollection: 'Wert pro Sammlung',
+  valueByCollection: 'Wert pro Kategorie',
   playFrequency: 'Spielhäufigkeit',
   categoryDistribution: 'Kategorieverteilung',
   valueTab: 'Wert',
   playTab: 'Spielen',
-  collectionsTab: 'Sammlungen',
+  collectionsTab: 'Kategorien',
   confirmDelete: 'Wirklich löschen?',
   confirmDeleteText: 'Diese Aktion kann nicht rückgängig gemacht werden.',
   owner: 'Besitzer',
@@ -80,7 +70,7 @@ export const LABELS = {
   loading: 'Laden...',
   error: 'Fehler',
   success: 'Erfolgreich',
-  // New labels for extended item fields
+  // Extended item fields
   location: 'Standort',
   borrowedTo: 'Ausgeborgt an',
   acquiredType: 'Herkunft',
@@ -99,30 +89,63 @@ export const LABELS = {
   hideDetails: 'Details ausblenden',
   noOccasion: 'Kein bestimmter Anlass',
   acquiredInfo: 'Herkunft & Kauf',
+  photoUrlPlaceholder: 'Bild-URL einfügen...',
+  saveUrl: 'URL speichern',
 }
 
 export const CATEGORIES = [
+  // Kleidung & Accessoires
   { id: 'schuhe', name: 'Schuhe', icon: '👟' },
-  { id: 'autos', name: 'Autos', icon: '🚗' },
-  { id: 'puzzle', name: 'Puzzle', icon: '🧩' },
-  { id: 'puppen', name: 'Puppen', icon: '🧸' },
-  { id: 'lego', name: 'LEGO', icon: '🧱' },
-  { id: 'buecher', name: 'Bücher', icon: '📚' },
+  { id: 'jacken', name: 'Jacken & Mäntel', icon: '🧥' },
   { id: 'kleidung', name: 'Kleidung', icon: '👗' },
-  { id: 'sport', name: 'Sport', icon: '⚽' },
-  { id: 'elektronik', name: 'Elektronik', icon: '🎮' },
-  { id: 'brettspiele', name: 'Brettspiele', icon: '🎲' },
-  { id: 'figuren', name: 'Figuren', icon: '🦸' },
-  { id: 'musik', name: 'Musik', icon: '🎵' },
-  { id: 'kunst', name: 'Kunst', icon: '🎨' },
+  { id: 'schmuck', name: 'Schmuck & Uhren', icon: '💍' },
+  { id: 'taschen', name: 'Taschen & Koffer', icon: '👜' },
+
+  // Elektronik & Medien
+  { id: 'elektronik', name: 'Elektronik', icon: '📱' },
+  { id: 'konsolen', name: 'Spielkonsolen', icon: '🎮' },
+  { id: 'ps5', name: 'PS5 Spiele', icon: '🕹️' },
+  { id: 'ps4', name: 'PS4 Spiele', icon: '🎮' },
+  { id: 'xbox', name: 'Xbox Spiele', icon: '🟢' },
+  { id: 'nintendo', name: 'Nintendo Spiele', icon: '🔴' },
+  { id: 'pc_spiele', name: 'PC Spiele', icon: '🖥️' },
+  { id: 'videospiele', name: 'Videospiele (allg.)', icon: '👾' },
   { id: 'cd', name: 'CDs', icon: '💿' },
-  { id: 'dvd', name: 'DVDs', icon: '📀' },
-  { id: 'ps5', name: 'PS5 Spiele', icon: '🎮' },
-  { id: 'ps4', name: 'PS4 Spiele', icon: '🕹️' },
-  { id: 'videospiele', name: 'Videospiele', icon: '👾' },
-  { id: 'schmuck', name: 'Schmuck', icon: '💍' },
+  { id: 'dvd', name: 'DVDs & Blu-ray', icon: '📀' },
+  { id: 'vinyl', name: 'Vinyl / Schallplatten', icon: '🎶' },
+
+  // Spielzeug & Kinder
+  { id: 'puppen', name: 'Puppen & Stofftiere', icon: '🧸' },
+  { id: 'lego', name: 'LEGO & Bausteine', icon: '🧱' },
+  { id: 'puzzle', name: 'Puzzle', icon: '🧩' },
+  { id: 'brettspiele', name: 'Brettspiele', icon: '🎲' },
+  { id: 'autos', name: 'Spielzeugautos', icon: '🚗' },
+  { id: 'figuren', name: 'Figuren & Actionfiguren', icon: '🦸' },
+
+  // Sammlungen & Hobby
+  { id: 'muenzen', name: 'Münzen', icon: '🪙' },
+  { id: 'karten', name: 'Sammelkarten', icon: '🃏' },
+  { id: 'briefmarken', name: 'Briefmarken', icon: '📮' },
+  { id: 'comics', name: 'Comics & Manga', icon: '📖' },
+  { id: 'buecher', name: 'Bücher', icon: '📚' },
+  { id: 'kunst', name: 'Kunst & Deko', icon: '🎨' },
+  { id: 'musik_instr', name: 'Musikinstrumente', icon: '🎸' },
+
+  // Haus & Garten
+  { id: 'moebel', name: 'Möbel', icon: '🛋️' },
+  { id: 'kueche', name: 'Küche & Haushalt', icon: '🍳' },
   { id: 'werkzeug', name: 'Werkzeug', icon: '🔧' },
-  { id: 'outdoor', name: 'Outdoor', icon: '🏕️' },
+  { id: 'garten', name: 'Garten', icon: '🌿' },
+
+  // Sport & Outdoor
+  { id: 'sport', name: 'Sport & Fitness', icon: '⚽' },
+  { id: 'outdoor', name: 'Outdoor & Camping', icon: '🏕️' },
+  { id: 'fahrrad', name: 'Fahrrad & Zubehör', icon: '🚲' },
+
+  // Fahrzeuge
+  { id: 'auto', name: 'Auto & Zubehör', icon: '🚙' },
+
+  // Sonstiges
   { id: 'sonstiges', name: 'Sonstiges', icon: '📦' },
 ]
 
@@ -131,6 +154,8 @@ export const LOCATIONS = [
   { id: 'keller', name: 'Keller', icon: '📦' },
   { id: 'dachboden', name: 'Dachboden', icon: '🏚️' },
   { id: 'garage', name: 'Garage', icon: '🚗' },
+  { id: 'buero', name: 'Büro / Arbeit', icon: '🏢' },
+  { id: 'lager', name: 'Lagerraum', icon: '🏗️' },
   { id: 'ausgeborgt', name: 'Ausgeborgt', icon: '🔄' },
 ]
 
@@ -140,14 +165,17 @@ export const OCCASIONS = [
   { id: 'ramadan', name: 'Ramadan', icon: '🌙' },
   { id: 'eid', name: 'Eid', icon: '🕌' },
   { id: 'ostern', name: 'Ostern', icon: '🐰' },
+  { id: 'hochzeit', name: 'Hochzeit', icon: '💒' },
+  { id: 'einschulung', name: 'Einschulung', icon: '🎒' },
+  { id: 'namenstag', name: 'Namenstag', icon: '📛' },
   { id: 'sonstiges', name: 'Sonstiger Anlass', icon: '🎁' },
 ]
 
 export const COLLECTION_ICONS = [
-  '👟', '🚗', '🧩', '🧸', '🧱', '📚', '👗', '⚽', '🎮', '📦',
-  '🎨', '🎵', '🌿', '🏠', '💎', '🎁', '🧳', '🔧', '🎲', '🪀',
-  '🎸', '🎪', '🦸', '🐻', '🌟', '🚀', '🎯', '🏆', '💡', '🧪',
-  '💿', '📀', '🕹️', '👾', '💍', '🏕️',
+  '👟', '🧥', '👗', '💍', '👜', '📱', '🎮', '🕹️', '👾', '💿',
+  '📀', '🎶', '🧸', '🧱', '🧩', '🎲', '🚗', '🦸', '🪙', '🃏',
+  '📮', '📖', '📚', '🎨', '🎸', '🛋️', '🍳', '🔧', '🌿', '⚽',
+  '🏕️', '🚲', '🚙', '📦', '🎁', '💎', '🏆', '🎯', '💡', '🧪',
 ]
 
 export const AVATARS = [
