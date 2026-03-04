@@ -1,0 +1,253 @@
+import { useState, useEffect } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { getCollection, getItems, deleteCollection, createItem, getCollectionValue } from '@/lib/api'
+import { LABELS, CATEGORIES } from '@/lib/constants'
+import { ArrowLeft, Plus, Trash2, Edit2, Search, X, Package } from 'lucide-react'
+import toast from 'react-hot-toast'
+
+export default function CollectionDetail() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [collection, setCollection] = useState(null)
+  const [items, setItems] = useState([])
+  const [totalValue, setTotalValue] = useState(0)
+  const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+
+  // New item form
+  const [itemName, setItemName] = useState('')
+  const [itemValue, setItemValue] = useState('')
+  const [itemCategory, setItemCategory] = useState('')
+  const [itemDesc, setItemDesc] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => { loadData() }, [id])
+
+  async function loadData() {
+    setLoading(true)
+    const [colRes, itemsRes, valRes] = await Promise.all([
+      getCollection(id),
+      getItems(id),
+      getCollectionValue(id),
+    ])
+    setCollection(colRes.data)
+    setItems(itemsRes.data || [])
+    setTotalValue(valRes.data || 0)
+    setLoading(false)
+  }
+
+  async function handleAddItem(e) {
+    e.preventDefault()
+    if (!itemName.trim()) return
+
+    setSaving(true)
+    const { error } = await createItem({
+      collection_id: id,
+      name: itemName.trim(),
+      value: parseFloat(itemValue) || 0,
+      category: itemCategory,
+      description: itemDesc,
+    })
+
+    if (error) {
+      toast.error(error)
+    } else {
+      toast.success('Teil hinzugefügt!')
+      setShowForm(false)
+      setItemName('')
+      setItemValue('')
+      setItemCategory('')
+      setItemDesc('')
+      loadData()
+    }
+    setSaving(false)
+  }
+
+  async function handleDeleteCollection() {
+    if (!confirm(LABELS.confirmDeleteText)) return
+    const { error } = await deleteCollection(id)
+    if (error) {
+      toast.error(error)
+    } else {
+      toast.success('Sammlung gelöscht')
+      navigate('/collections')
+    }
+  }
+
+  const filteredItems = items.filter((i) =>
+    i.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  if (loading) {
+    return (
+      <div className="animate-fade-in">
+        <div className="h-8 w-48 bg-fm-border/30 rounded animate-pulse mb-6" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="fm-card-static h-40 animate-pulse bg-fm-border/20" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (!collection) {
+    return <p className="text-center text-fm-text-muted py-16">Sammlung nicht gefunden</p>
+  }
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div>
+        <Link to="/collections" className="fm-btn-ghost text-sm mb-3 inline-flex">
+          <ArrowLeft size={16} /> {LABELS.collections}
+        </Link>
+
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">{collection.icon}</span>
+            <div>
+              <h1 className="fm-page-title">{collection.name}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="fm-badge bg-fm-primary/10 text-fm-primary">
+                  {totalValue.toFixed(0)} {LABELS.euro}
+                </span>
+                <span className="text-sm text-fm-text-muted">
+                  {items.length} {LABELS.items}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handleDeleteCollection} className="fm-btn-ghost p-2 text-red-400 hover:text-red-600">
+              <Trash2 size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Search + Add */}
+      <div className="flex gap-3">
+        <div className="flex-1 relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fm-text-muted" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="fm-input pl-9"
+            placeholder={LABELS.search}
+          />
+        </div>
+        <button onClick={() => setShowForm(true)} className="fm-btn-primary">
+          <Plus size={16} /> {LABELS.newItem}
+        </button>
+      </div>
+
+      {/* Add Item Form */}
+      {showForm && (
+        <div className="fm-card-static p-5 animate-slide-up">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading font-bold">{LABELS.newItem}</h3>
+            <button onClick={() => setShowForm(false)} className="fm-btn-ghost p-1">
+              <X size={18} />
+            </button>
+          </div>
+          <form onSubmit={handleAddItem} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="fm-label">{LABELS.name}</label>
+                <input
+                  type="text"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  className="fm-input"
+                  placeholder="z.B. Rote Sneaker"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="fm-label">{LABELS.value} ({LABELS.euro})</label>
+                <input
+                  type="number"
+                  value={itemValue}
+                  onChange={(e) => setItemValue(e.target.value)}
+                  className="fm-input"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="fm-label">{LABELS.category}</label>
+              <select
+                value={itemCategory}
+                onChange={(e) => setItemCategory(e.target.value)}
+                className="fm-select"
+              >
+                <option value="">-- Kategorie wählen --</option>
+                {CATEGORIES.map((c) => (
+                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="fm-label">{LABELS.description}</label>
+              <textarea
+                value={itemDesc}
+                onChange={(e) => setItemDesc(e.target.value)}
+                className="fm-input"
+                rows={2}
+                placeholder="Optionale Beschreibung..."
+              />
+            </div>
+            <button type="submit" disabled={saving || !itemName.trim()} className="fm-btn-primary w-full">
+              {saving ? LABELS.loading : LABELS.save}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Items Grid */}
+      {filteredItems.length === 0 ? (
+        <div className="text-center py-16">
+          <Package size={48} className="text-fm-text-muted mx-auto mb-3" />
+          <p className="text-fm-text-muted">{LABELS.noItems}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filteredItems.map((item) => {
+            const cat = CATEGORIES.find((c) => c.id === item.category)
+            return (
+              <Link
+                key={item.id}
+                to={`/items/${item.id}`}
+                className="fm-card overflow-hidden block"
+              >
+                <div className="aspect-square bg-fm-bg-input flex items-center justify-center">
+                  {item.image_url ? (
+                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-4xl">{cat?.icon || '📦'}</span>
+                  )}
+                </div>
+                <div className="p-3">
+                  <h4 className="font-heading font-semibold text-sm text-fm-text truncate">
+                    {item.name}
+                  </h4>
+                  <p className="text-sm text-fm-primary font-bold mt-0.5">
+                    {parseFloat(item.value || 0).toFixed(0)} {LABELS.euro}
+                  </p>
+                  {cat && (
+                    <span className="text-xs text-fm-text-muted">{cat.icon} {cat.name}</span>
+                  )}
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
