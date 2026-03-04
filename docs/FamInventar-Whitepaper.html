@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FamInventar — Whitepaper</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #FF8A65;
+    --primary-dark: #E64A19;
+    --secondary: #4DB6AC;
+    --text: #3E2723;
+    --text-light: #6D4C41;
+    --text-muted: #BCAAA4;
+    --bg: #FFF8F0;
+    --bg-card: #FFFFFF;
+    --border: #F5E6D8;
+    --green: #10B981;
+    --red: #EF4444;
+    --yellow: #F59E0B;
+    --blue: #3B82F6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #3E2723 0%, #5D4037 50%, #6D4C41 100%);
+    color: white;
+    border-radius: 16px;
+    margin-bottom: 48px;
+  }
+  .cover h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .cover .subtitle {
+    font-size: 18px;
+    opacity: 0.85;
+    margin-bottom: 24px;
+  }
+  .cover .version {
+    font-size: 14px;
+    opacity: 0.6;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 20px;
+    margin-top: 20px;
+  }
+  .cover .tech-badges {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .cover .tech-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* Headings */
+  h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 48px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--primary);
+    display: inline-block;
+  }
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 32px 0 12px;
+  }
+  h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 24px 0 8px;
+  }
+
+  p { margin-bottom: 12px; color: var(--text-light); }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+  .card-highlight {
+    background: linear-gradient(135deg, #FFF3E0, #FFF8F0);
+    border-left: 4px solid var(--primary);
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th {
+    background: #3E2723;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-light);
+  }
+  tr:nth-child(even) td { background: #FAFAF7; }
+  tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+  tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+
+  /* Code */
+  pre {
+    background: #2D2D2D;
+    color: #E0E0E0;
+    padding: 16px 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: #F5E6D8;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--primary-dark);
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* Stat Grid */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Module Header */
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 40px 0 16px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .module-header .icon { font-size: 32px; }
+  .module-header .title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .module-header .status {
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-done { background: #D1FAE5; color: #065F46; }
+  .status-planned { background: #FEF3C7; color: #92400E; }
+
+  /* Lists */
+  ul { margin: 8px 0 12px 20px; color: var(--text-light); }
+  li { margin-bottom: 6px; }
+
+  /* Diagram boxes */
+  .diagram {
+    background: #F9FAFB;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--text-light);
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-green { background: #D1FAE5; color: #065F46; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+  .badge-yellow { background: #FEF3C7; color: #92400E; }
+  .badge-gray { background: #F3F4F6; color: #4B5563; }
+
+  /* Roadmap */
+  .roadmap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .roadmap-item:last-child { border-bottom: none; }
+  .roadmap-check { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 64px;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Section number */
+  .section-num {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; font-size: 12px; }
+    .container { padding: 0; max-width: 100%; }
+    .cover { break-after: page; }
+    h2 { break-before: page; }
+    pre { font-size: 11px; }
+    .card { break-inside: avoid; }
+    table { break-inside: avoid; }
+  }
+
+  /* Comparison box */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .comparison-col {
+    padding: 16px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .comparison-green { background: #ECFDF5; border: 1px solid #A7F3D0; }
+  .comparison-red { background: #FEF2F2; border: 1px solid #FECACA; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- COVER -->
+  <div class="cover">
+    <h1>FamInventar</h1>
+    <p class="subtitle">Persönliche Lebens- und Geschäftsmanagement-Plattform</p>
+    <div class="tech-badges">
+      <span class="tech-badge">React 18</span>
+      <span class="tech-badge">Supabase</span>
+      <span class="tech-badge">Tailwind CSS</span>
+      <span class="tech-badge">PostgreSQL</span>
+    </div>
+    <p class="version">Whitepaper · Version 1.0 · März 2026</p>
+  </div>
+
+  <!-- 1. EXECUTIVE SUMMARY -->
+  <h2><span class="section-num">1.</span> Executive Summary</h2>
+  <p>FamInventar ist eine modulare Webanwendung zur Verwaltung des persönlichen und geschäftlichen Alltags. Die Plattform vereint mehrere Kernbereiche in einem einzigen System:</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="value">📦</div>
+      <div class="label">Inventar</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">🛒</div>
+      <div class="label">Handel</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">📋</div>
+      <div class="label">Tracker</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">🥤</div>
+      <div class="label">Konsum *</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">💼</div>
+      <div class="label">Arbeit *</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">📊</div>
+      <div class="label">Zeit vs Geld *</div>
+    </div>
+  </div>
+  <p style="font-size: 12px; color: var(--text-muted);">* In Planung</p>
+
+  <!-- 2. PROBLEMSTELLUNG -->
+  <h2><span class="section-num">2.</span> Problemstellung</h2>
+  <p>Im Alltag verwenden die meisten Menschen separate Tools für verschiedene Bereiche: eine App für Inventar, Excel für Handelskalkulationen, eine Habit-Tracker-App, einen Timer für Arbeitszeit, manuelle Berechnungen für Kosten.</p>
+
+  <div class="card card-highlight">
+    <p style="margin:0; font-weight: 600; color: var(--text);">Diese Fragmentierung führt zu:</p>
+    <ul>
+      <li><strong>Datenverlust</strong> — Informationen verteilt über mehrere Systeme</li>
+      <li><strong>Fehlende Querverbindungen</strong> — Keine Analyse zwischen Einnahmen und Ausgaben</li>
+      <li><strong>Redundante Dateneingabe</strong> — Gleiche Informationen mehrfach erfassen</li>
+      <li><strong>Mangelnde Übersicht</strong> — Kein einheitliches Dashboard</li>
+    </ul>
+  </div>
+
+  <!-- 3. ARCHITEKTUR -->
+  <h2><span class="section-num">3.</span> Systemarchitektur</h2>
+
+  <h3>3.1 Technologie-Stack</h3>
+  <table>
+    <tr><th>Schicht</th><th>Technologie</th><th>Details</th></tr>
+    <tr><td>Frontend</td><td>React 18.3 + Vite 5.4</td><td>SPA mit Hot Reload</td></tr>
+    <tr><td>Styling</td><td>Tailwind CSS 3.4</td><td>Custom fm-* Klassen</td></tr>
+    <tr><td>Backend</td><td>Supabase</td><td>Auth, PostgreSQL, Storage</td></tr>
+    <tr><td>Charts</td><td>Recharts 2.12</td><td>Bar, Line, Responsive</td></tr>
+    <tr><td>Icons</td><td>Lucide React</td><td>200+ SVG Icons</td></tr>
+    <tr><td>Routing</td><td>React Router 6</td><td>Geschützte Routen</td></tr>
+  </table>
+
+  <h3>3.2 Datenbankarchitektur</h3>
+  <div class="card">
+    <p style="margin-bottom: 8px; font-weight: 600;">Einheitliche Konventionen:</p>
+    <ul>
+      <li><code>fm_</code> Prefix auf allen Tabellen</li>
+      <li>UUID Primärschlüssel via <code>gen_random_uuid()</code></li>
+      <li><code>user_id</code> Spalte auf jeder Tabelle</li>
+      <li>Row Level Security mit <code>user_id = auth.uid()</code></li>
+    </ul>
+  </div>
+
+  <div class="diagram">┌─────────────────────────────────────┐
+│           Supabase Auth             │
+│        (Benutzer-Verwaltung)        │
+└──────────────┬──────────────────────┘
+               │ user_id
+   ┌───────────┼──────────┐
+   │           │          │
+┌──┴──┐   ┌───┴───┐  ┌───┴───┐
+│ INV │   │HANDEL │  │TRACK. │
+│     │   │       │  │       │
+│3 Tab│   │3 Tab. │  │3 Tab. │
+└─────┘   └───────┘  └───────┘</div>
+
+  <!-- 4. INVENTAR -->
+  <div class="module-header">
+    <span class="icon">📦</span>
+    <span class="title">Inventar</span>
+    <span class="badge status-done">Fertig</span>
+  </div>
+
+  <h3>Funktionsumfang</h3>
+  <ul>
+    <li><strong>35+ Kategorien</strong> — Schuhe, Elektronik, Spielzeug, Werkzeug, etc.</li>
+    <li><strong>Fotoverwaltung</strong> — Upload oder URL-basierte Bilder</li>
+    <li><strong>Wertberechnung</strong> — Automatische Summierung pro Kategorie</li>
+    <li><strong>Standortverwaltung</strong> — Zuhause, Keller, Garage, Büro, Ausgeborgt</li>
+    <li><strong>Herkunfts-Tracking</strong> — Gekauft (Geschäft, Datum, Rechnung) oder Geschenkt (Anlass, Schenker)</li>
+    <li><strong>Spielprotokoll</strong> — Häufigkeit, Dauer, Top-5 Ranking</li>
+  </ul>
+
+  <table>
+    <tr><th>Tabelle</th><th>Beschreibung</th></tr>
+    <tr><td><code>fm_collections</code></td><td>Kategorien / Inventar-Gruppen</td></tr>
+    <tr><td><code>fm_items</code></td><td>Einzelne Gegenstände mit Wert, Foto, Standort, Herkunft</td></tr>
+    <tr><td><code>fm_play_logs</code></td><td>Spielprotokoll mit Dauer und Notizen</td></tr>
+  </table>
+
+  <!-- 5. HANDEL -->
+  <div class="module-header">
+    <span class="icon">🛒</span>
+    <span class="title">Handel</span>
+    <span class="badge status-done">Fertig</span>
+  </div>
+
+  <h3>Chargen-System</h3>
+  <p>Jeder Einkauf erhält eine automatisch generierte Chargen-Nummer:</p>
+  <pre><code>Produktname → Prefix (max 4 Zeichen, Großbuchstaben)
+Jahr → 4-stellig
+Laufende Nummer → 3-stellig
+
+Beispiele: TEE-2026-001, TEE-2026-002, KAFF-2026-001</code></pre>
+
+  <h3>Margenkalkulation</h3>
+  <div class="card">
+    <p style="font-weight: 600; margin-bottom: 8px;">Echtzeit-Berechnung pro Verkauf:</p>
+    <pre><code>Einkauf: 1000g Sencha Tee für 60,00 € → 0,06 €/g
+Verkauf: 200g für 15,00 €
+Kosten:  200 × 0,06     = 12,00 €
+Gewinn:  15,00 - 12,00   =  3,00 € (Marge: 20%)</code></pre>
+  </div>
+
+  <h3>Auto-Status-System</h3>
+  <p>Kaufstatus aktualisiert sich automatisch bei jedem Verkauf:</p>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0;">
+    <span class="badge badge-blue">🛒 Eingekauft</span>
+    <span style="color: var(--text-muted);">→</span>
+    <span class="badge badge-green">📦 Im Lager</span>
+    <span style="color: var(--text-muted);">→</span>
+    <span class="badge badge-yellow">📊 Teilw. verkauft</span>
+    <span style="color: var(--text-muted);">→</span>
+    <span class="badge badge-gray">✅ Ausverkauft</span>
+  </div>
+
+  <h3>Warnungssystem</h3>
+  <ul>
+    <li><span class="badge badge-red">Niedriger Bestand</span> — Restbestand unter Mindestbestand</li>
+    <li><span class="badge badge-yellow">Alte Charge</span> — Älter als 6 Monate mit Restbestand</li>
+  </ul>
+
+  <table>
+    <tr><th>Tabelle</th><th>Beschreibung</th></tr>
+    <tr><td><code>fm_products</code></td><td>Produktdefinitionen (Name, Kategorie, Einheit, Mindestbestand)</td></tr>
+    <tr><td><code>fm_purchases</code></td><td>Einkäufe/Chargen (Batch-ID, Menge, Preis, Lieferant, Status)</td></tr>
+    <tr><td><code>fm_sales</code></td><td>Verkäufe (Käufer, Menge, Verkaufspreis, Status)</td></tr>
+  </table>
+
+  <!-- 6. TRACKER -->
+  <div class="module-header">
+    <span class="icon">📋</span>
+    <span class="title">Tracker</span>
+    <span class="badge status-done">Fertig</span>
+  </div>
+
+  <h3>4 Tracker-Typen</h3>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="value">🔢</div><div class="label">Zähler</div></div>
+    <div class="stat-card"><div class="value">💰</div><div class="label">Kosten</div></div>
+    <div class="stat-card"><div class="value">⏱️</div><div class="label">Zeit</div></div>
+    <div class="stat-card"><div class="value">📊</div><div class="label">Kombi</div></div>
+  </div>
+
+  <h3>Vorlagen</h3>
+  <table>
+    <tr><th>Vorlage</th><th>Typ</th><th>Einheit</th><th>Standardziel</th></tr>
+    <tr><td>🚬 Zigaretten</td><td>Kombi</td><td>Stk.</td><td>Max. 10/Tag</td></tr>
+    <tr><td>💪 Fitness</td><td>Zeit</td><td>Min.</td><td>Min. 30/Tag</td></tr>
+    <tr><td>🧹 Haushalt</td><td>Zähler</td><td>Aufg.</td><td>Min. 3/Tag</td></tr>
+    <tr><td>♨️ Sauna</td><td>Kombi</td><td>Gänge</td><td>—</td></tr>
+  </table>
+
+  <h3>Zigaretten-Speziallogik</h3>
+
+  <h4>Drei Konsumarten mit automatischer Kostenberechnung</h4>
+  <table>
+    <tr><th>Art</th><th>Preisermittlung</th><th>Beispielpreis</th></tr>
+    <tr><td><span class="badge badge-red">🏪 Gekauft</span></td><td>Benutzerdefiniert</td><td>0,35 €</td></tr>
+    <tr><td><span class="badge badge-green">🌿 Gedreht</span></td><td>Automatisch aus Materialien</td><td>0,20 €</td></tr>
+    <tr><td><span class="badge badge-blue">💨 E-Zigarette</span></td><td>Benutzerdefiniert</td><td>0,15 €</td></tr>
+  </table>
+
+  <h4>Materialkosten-Berechnung (Selbstgedrehte)</h4>
+  <div class="card">
+    <pre><code>Kosten/Stück = Σ (Verbrauch × Preis/Einheit)
+
+Tabak:     0,7g × (7,00€ ÷ 30g)  = 0,163 €
+Blättchen: 1 St × (1,50€ ÷ 50)   = 0,030 €
+Filter:    1 St × (1,20€ ÷ 120)   = 0,010 €
+───────────────────────────────────────
+Gesamt pro Zigarette:                0,203 €</code></pre>
+  </div>
+
+  <h3>Tagesziel & Reduktionsmodus</h3>
+  <div class="comparison">
+    <div class="comparison-col comparison-red">
+      <p style="font-weight: 700; color: var(--red); margin-bottom: 4px;">↓ Maximum</p>
+      <p style="font-size: 13px;">"Max. 10 Zigaretten"</p>
+      <p style="font-size: 12px; color: var(--text-muted);">Grün → Gelb → Rot</p>
+    </div>
+    <div class="comparison-col comparison-green">
+      <p style="font-weight: 700; color: var(--green); margin-bottom: 4px;">↑ Minimum</p>
+      <p style="font-size: 13px;">"Mind. 30 Min. Training"</p>
+      <p style="font-size: 12px; color: var(--text-muted);">Rot → Gelb → Grün</p>
+    </div>
+  </div>
+
+  <h3>Ersparnis-Rechner</h3>
+  <div class="card card-highlight">
+    <p style="font-weight: 600; margin-bottom: 8px;">Beispiel: 5 Zigaretten weniger pro Tag (à 0,35 €)</p>
+    <div class="stat-grid">
+      <div class="stat-card" style="background: #ECFDF5;">
+        <div class="value" style="color: var(--green);">1,75 €</div>
+        <div class="label">pro Tag</div>
+      </div>
+      <div class="stat-card" style="background: #ECFDF5;">
+        <div class="value" style="color: var(--green);">52,50 €</div>
+        <div class="label">pro Monat</div>
+      </div>
+      <div class="stat-card" style="background: #D1FAE5;">
+        <div class="value" style="color: #065F46;">639 €</div>
+        <div class="label">pro Jahr</div>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Tabelle</th><th>Beschreibung</th></tr>
+    <tr><td><code>fm_trackers</code></td><td>Tracker-Definitionen (Typ, Ziel, Untertypen, Raucher-Flag)</td></tr>
+    <tr><td><code>fm_tracker_entries</code></td><td>Einträge (Datum, Anzahl, Kosten, Dauer, Untertyp, Uhrzeit)</td></tr>
+    <tr><td><code>fm_smoking_materials</code></td><td>Materialien für Kostenberechnung (Menge, Preis, Verbrauch)</td></tr>
+  </table>
+
+  <!-- 7. KONSUM-KATALOG (GEPLANT) -->
+  <div class="module-header">
+    <span class="icon">🥤</span>
+    <span class="title">Konsum-Katalog</span>
+    <span class="badge status-planned">Geplant</span>
+  </div>
+
+  <p>Erweiterung des Tracker-Moduls: Konsumgüter einmal definieren, dann per Schnelltipp erfassen.</p>
+
+  <table>
+    <tr><th>Getränk</th><th>Größe</th><th>Preis</th><th>Koffein</th></tr>
+    <tr><td>⚡ Energy Drink</td><td>250 ml</td><td>1,80 €</td><td>80 mg</td></tr>
+    <tr><td>🥤 Coca-Cola</td><td>500 ml</td><td>2,20 €</td><td>50 mg</td></tr>
+    <tr><td>☕ Kaffee</td><td>200 ml</td><td>0,50 €</td><td>95 mg</td></tr>
+    <tr><td>💧 Wasser</td><td>500 ml</td><td>0,00 €</td><td>0 mg</td></tr>
+  </table>
+
+  <div class="card">
+    <pre><code>Heute:
+  ⚡ Energy Drink × 2    3,60 €   160 mg Koffein
+  🥤 Coca-Cola × 1       2,20 €    50 mg Koffein
+  ──────────────────────────────────────────
+  Gesamt: 3 Getränke     5,80 €   210 mg Koffein</code></pre>
+  </div>
+
+  <h4>Koffein-Grenzwerte</h4>
+  <div style="display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap;">
+    <span class="badge badge-green">&lt; 200 mg — Moderat</span>
+    <span class="badge badge-yellow">200–400 mg — Erhöht</span>
+    <span class="badge badge-red">&gt; 400 mg — Hoch (FDA-Empfehlung)</span>
+  </div>
+
+  <!-- 8. ARBEIT & PROJEKTE (GEPLANT) -->
+  <div class="module-header">
+    <span class="icon">💼</span>
+    <span class="title">Arbeit & Projekte</span>
+    <span class="badge status-planned">Geplant</span>
+  </div>
+
+  <h3>Timer-System</h3>
+  <div class="card">
+    <pre><code>09:00  ▶ Start (Projekt: Supersonic Analyzer)
+12:00  ⏸ Pause
+12:30  ▶ Fortsetzen
+16:30  ⏹ Stop
+
+Arbeitszeit: 7:00h (abzgl. 30 Min. Pause)</code></pre>
+  </div>
+
+  <h3>Schwierigkeitsmultiplikator</h3>
+  <p>Nach jeder Sitzung wird die Schwierigkeit bewertet (1–10). Der Multiplikator erhöht den effektiven Stundensatz:</p>
+
+  <table>
+    <tr><th>Schwierigkeit</th><th>Multiplikator</th><th>Effektiv (Basis 35 €)</th></tr>
+    <tr><td>1</td><td>1,0×</td><td>35,00 €/h</td></tr>
+    <tr><td>3</td><td>1,2×</td><td>42,00 €/h</td></tr>
+    <tr><td>5</td><td>1,5×</td><td>52,50 €/h</td></tr>
+    <tr><td>7</td><td>2,0×</td><td>70,00 €/h</td></tr>
+    <tr><td>8</td><td>2,3×</td><td>80,50 €/h</td></tr>
+    <tr><td>10</td><td>3,0×</td><td>105,00 €/h</td></tr>
+  </table>
+
+  <div class="card card-highlight">
+    <p style="font-weight: 600; margin-bottom: 8px;">Berechnungsformel:</p>
+    <pre><code>Sitzungswert = Stunden × Stundensatz × Multiplikator
+
+Beispiel: 7h × 35€ × 2,3 (Schwierigkeit 8) = 563,50 €</code></pre>
+  </div>
+
+  <h3>Projekt-Controlling</h3>
+  <div class="card">
+    <pre><code>┌──────────────────────────────────┐
+│ Supersonic Analyzer              │
+│──────────────────────────────────│
+│ Gesamtzeit:       42 Stunden     │
+│ Schwierigkeit Ø:  7,4            │
+│ Projektwert:      3.250 €        │
+│ Sitzungen:        12             │
+│ Eff. Stundensatz: 77,38 € (Ø)   │
+└──────────────────────────────────┘</code></pre>
+  </div>
+
+  <h3>Kunden-Verwaltung</h3>
+  <p>Projekte können Kunden zugeordnet werden für aggregierte Statistiken:</p>
+  <div class="card">
+    <pre><code>Kunde: Agentur XYZ
+  ├─ Projekt A: 120h, 4.200 €
+  ├─ Projekt B:  45h, 1.890 €
+  └─ Projekt C:  18h,   945 €
+  ─────────────────────────────
+  Gesamt: 183h, 7.035 €</code></pre>
+  </div>
+
+  <!-- 9. ZEIT VS GELD -->
+  <div class="module-header">
+    <span class="icon">📊</span>
+    <span class="title">Zeit vs. Geld</span>
+    <span class="badge status-planned">Geplant</span>
+  </div>
+
+  <p>Die leistungsstärkste Funktion: modulübergreifende Analyse, die Arbeitseinnahmen den Konsumausgaben gegenüberstellt.</p>
+
+  <div class="card" style="background: #F9FAFB;">
+    <p style="font-weight: 700; font-size: 16px; margin-bottom: 12px;">Diese Woche</p>
+    <div class="comparison">
+      <div class="comparison-col comparison-green">
+        <p style="font-size: 24px; font-weight: 700; color: var(--green);">820,00 €</p>
+        <p style="font-size: 13px;">💼 Verdienst (Arbeit)</p>
+      </div>
+      <div class="comparison-col comparison-red">
+        <p style="font-size: 24px; font-weight: 700; color: var(--red);">-55,80 €</p>
+        <p style="font-size: 13px;">🚬 37,80 € · ⚡ 12,60 € · 🥤 5,40 €</p>
+      </div>
+    </div>
+    <div style="text-align: center; padding: 12px; background: white; border-radius: 8px; margin-top: 8px;">
+      <p style="font-size: 20px; font-weight: 700; color: var(--text);">✅ Netto: 764,20 €</p>
+      <p style="font-size: 13px; color: var(--text-muted);">⏰ 2 Stunden Arbeit gingen für Zigaretten und Getränke drauf.</p>
+    </div>
+  </div>
+
+  <div class="card card-highlight">
+    <p style="font-weight: 600; color: var(--text);">Motivationseffekt:</p>
+    <p>„54 € pro Woche für Zigaretten" klingt abstrakt.<br>
+    „2 Stunden deiner Arbeitszeit gehen für Zigaretten drauf" ist konkret.</p>
+  </div>
+
+  <!-- 10. SICHERHEIT -->
+  <h2><span class="section-num">10.</span> Datenschutz & Sicherheit</h2>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="value">🔒</div>
+      <div class="label">Row Level Security auf jeder Tabelle</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">🔑</div>
+      <div class="label">JWT-basierte Auth via Supabase</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">👤</div>
+      <div class="label">Strenge Datenisolierung pro Benutzer</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">📸</div>
+      <div class="label">Sichere Datei-speicherung (5 MB max)</div>
+    </div>
+  </div>
+
+  <!-- 11. KENNZAHLEN -->
+  <h2><span class="section-num">11.</span> Technische Kennzahlen</h2>
+
+  <table>
+    <tr><th>Metrik</th><th>Wert</th></tr>
+    <tr><td>Datenbanktabellen</td><td>9</td></tr>
+    <tr><td>Migrationen</td><td>4 (v1–v4)</td></tr>
+    <tr><td>API-Funktionen</td><td>~60</td></tr>
+    <tr><td>React-Seiten</td><td>16</td></tr>
+    <tr><td>React-Komponenten</td><td>15+</td></tr>
+    <tr><td>Zeilen Code (Frontend)</td><td>5.000+</td></tr>
+    <tr><td>Build-Größe</td><td>710 KB (gzip: 194 KB)</td></tr>
+  </table>
+
+  <!-- 12. ROADMAP -->
+  <h2><span class="section-num">12.</span> Roadmap</h2>
+
+  <div class="card">
+    <p style="font-weight: 700; margin-bottom: 12px;">Phase 1 — Abgeschlossen</p>
+    <div class="roadmap-item"><span class="roadmap-check">✅</span><div>Inventar-Modul (Kategorien, Gegenstände, Fotos, Werte)</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">✅</span><div>Erweiterte Felder (Standort, Herkunft, Rechnung)</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">✅</span><div>Handel-Modul (Produkte, Chargen, Teilverkäufe, Margen)</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">✅</span><div>Tracker-Modul (Gewohnheiten, Zigaretten-Kosten, Streaks)</div></div>
+  </div>
+
+  <div class="card">
+    <p style="font-weight: 700; margin-bottom: 12px;">Phase 2 — In Planung</p>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Konsum-Katalog (Getränke-Tracking, Koffein/Zucker)</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Arbeit & Projekte (Timer, Schwierigkeitsmultiplikator)</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Kunden-Verwaltung</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Zeit vs. Geld Cross-Modul-Analyse</div></div>
+  </div>
+
+  <div class="card">
+    <p style="font-weight: 700; margin-bottom: 12px;">Phase 3 — Zukunft</p>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Wochenbericht (automatisierte Zusammenfassung)</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Rechnungs-Vorschau aus Arbeitssitzungen</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Export-Funktionen (CSV, PDF)</div></div>
+    <div class="roadmap-item"><span class="roadmap-check">⬜</span><div>Dark Mode + PWA (Offline-Nutzung)</div></div>
+  </div>
+
+  <!-- 13. FAZIT -->
+  <h2><span class="section-num">13.</span> Fazit</h2>
+
+  <div class="card card-highlight">
+    <p style="font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
+      FamInventar ist keine einzelne App — es ist eine persönliche Lebens- und Geschäftsmanagement-Plattform.
+    </p>
+    <p>Die modulare Architektur ermöglicht schrittweise Erweiterung, ohne bestehende Funktionalität zu beeinträchtigen. Die Stärke des Systems liegt in der Integration: Wo andere Anwendungen isolierte Datenpunkte liefern, schafft FamInventar Querverbindungen zwischen Arbeit, Konsum und Gewohnheiten.</p>
+    <p style="margin-bottom: 0; font-style: italic; color: var(--text-muted);">Manchmal reicht ein Dashboard, um Gewohnheiten zu ändern. Manchmal auch nicht. Menschen sind kompliziert. Systeme sind wenigstens ehrlich.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>FamInventar</strong> — Entwickelt 2026</p>
+    <p>React · Supabase · Tailwind CSS · PostgreSQL</p>
+  </div>
+
+</div>
+
+</body>
+</html>
