@@ -26,14 +26,18 @@ export default function TrackerDetail() {
   const [entryNotes, setEntryNotes] = useState('')
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { loadData() }, [id])
-
-  async function loadData() {
-    setLoading(true)
-    const { data } = await getTrackerDetailStats(id)
-    setStats(data)
-    setLoading(false)
-  }
+  useEffect(() => {
+    let mounted = true
+    async function load() {
+      setLoading(true)
+      const { data } = await getTrackerDetailStats(id)
+      if (!mounted) return
+      setStats(data || null)
+      setLoading(false)
+    }
+    load()
+    return () => { mounted = false }
+  }, [id])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -243,7 +247,15 @@ export default function TrackerDetail() {
       <div className="fm-card-static p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-heading font-bold text-fm-text">{TRACKER_LABELS.einträge} ({entries.length})</h2>
-          <button onClick={() => setShowForm(!showForm)} className="fm-btn-primary text-sm">
+          <button
+            onClick={() => {
+              if (!showForm && tracker.has_subtypes && tracker.subtypes?.length > 0 && !entrySubtype) {
+                setEntrySubtype(tracker.subtypes[0])
+              }
+              setShowForm(!showForm)
+            }}
+            className="fm-btn-primary text-sm"
+          >
             <Plus size={14} /> {TRACKER_LABELS.neuerEintrag}
           </button>
         </div>

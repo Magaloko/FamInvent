@@ -21,15 +21,25 @@ export default function TrackerMaterialien() {
   const [usagePerCig, setUsagePerCig] = useState('')
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { loadData() }, [id])
-
   async function loadData() {
     setLoading(true)
     const [tRes, mRes] = await Promise.all([getTracker(id), getMaterials(id)])
     setTracker(tRes.data)
-    setMaterials(mRes.data)
+    setMaterials(mRes.data || [])
     setLoading(false)
   }
+
+  useEffect(() => {
+    let mounted = true
+    setLoading(true)
+    Promise.all([getTracker(id), getMaterials(id)]).then(([tRes, mRes]) => {
+      if (!mounted) return
+      setTracker(tRes.data)
+      setMaterials(mRes.data || [])
+      setLoading(false)
+    })
+    return () => { mounted = false }
+  }, [id])
 
   function resetForm() {
     setName(''); setPkgAmount(''); setPkgUnit('g'); setPkgPrice(''); setUsagePerCig('')

@@ -9,13 +9,23 @@ export default function TrackerDashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => { loadData() }, [])
+  useEffect(() => {
+    let mounted = true
+    async function load() {
+      setLoading(true)
+      const { data } = await getTrackerStats()
+      if (!mounted) return
+      setStats(data || { trackers: [], todayTotal: 0, todayCost: 0, weekTrend: 0 })
+      setLoading(false)
+    }
+    load()
+    return () => { mounted = false }
+  }, [])
 
-  async function loadData() {
-    setLoading(true)
+  // Lightweight refresh after quick-add (no loading skeleton flash)
+  async function handleQuickAddRefresh() {
     const { data } = await getTrackerStats()
-    setStats(data)
-    setLoading(false)
+    if (data) setStats(data)
   }
 
   if (loading) {
@@ -29,7 +39,7 @@ export default function TrackerDashboard() {
     )
   }
 
-  const { trackers, todayTotal, todayCost, weekTrend } = stats
+  const { trackers = [], todayTotal = 0, todayCost = 0, weekTrend = 0 } = stats || {}
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -75,7 +85,7 @@ export default function TrackerDashboard() {
         <div className="space-y-3">
           <h2 className="font-heading font-bold text-fm-text">{TRACKER_LABELS.trackerListe}</h2>
           {trackers.map((t) => (
-            <TrackerSummaryCard key={t.id} tracker={t} onQuickAdd={loadData} />
+            <TrackerSummaryCard key={t.id} tracker={t} onQuickAdd={handleQuickAddRefresh} />
           ))}
         </div>
       )}

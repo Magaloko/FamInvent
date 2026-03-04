@@ -19,7 +19,7 @@ export function computeStreak(entries, dailyGoal, goalDirection = 'max') {
     byDate[d] = (byDate[d] || 0) + (parseFloat(e.count) || 0)
   })
 
-  // Get sorted unique dates going backwards from today
+  // Build date list going backwards from today (up to 365 days)
   const today = new Date().toISOString().split('T')[0]
   const dates = []
   const d = new Date(today)
@@ -28,22 +28,40 @@ export function computeStreak(entries, dailyGoal, goalDirection = 'max') {
     d.setDate(d.getDate() - 1)
   }
 
-  function meetsGoal(dateStr) {
+  // For min-direction: only check days that have entries
+  // (we don't count days where user has no data yet as "failed")
+  // For max-direction: 0 entries = 0 units = always under limit (counts as success)
+  function meetsGoal(dateStr, idx) {
     const val = byDate[dateStr] || 0
-    return goalDirection === 'max' ? val <= dailyGoal : val >= dailyGoal
+    if (goalDirection === 'max') {
+      return val <= dailyGoal
+    } else {
+      // min-direction: only consider days where an entry was actually made
+      // Skip days with no entries (they are "not tracked" not "failed")
+      if (val === 0 && !byDate[dateStr]) return null // no data = skip
+      return val >= dailyGoal
+    }
   }
 
   let current = 0
   let best = 0
   let streak = 0
+  let inCurrentRun = true // whether we're still in a run from today
 
   for (let i = 0; i < dates.length; i++) {
-    if (meetsGoal(dates[i])) {
+    const result = meetsGoal(dates[i], i)
+    if (result === null) {
+      // No data for this day — skip (don't break streak, don't extend)
+      // But do break current run if we've gone past today
+      continue
+    }
+    if (result) {
       streak++
-      if (i < current + 1) current = streak // still counting from today
+      if (inCurrentRun) current = streak
       best = Math.max(best, streak)
     } else {
       if (i === 0) current = 0 // today doesn't meet goal
+      inCurrentRun = false
       streak = 0
     }
   }
@@ -292,20 +310,25 @@ export async function getTrackerDetailStats(trackerId, days = 30) {
   const endDate = new Date().toISOString().split('T')[0]
   const startDate = new Date(Date.now() - days * 86400000).toISOString().split('T')[0]
 
-  const [trackerRes, entriesRes, materialsRes] = await Promise.all([
+  const [trackerRes, entriesRes, materialsRes, allEntriesRes] = await Promise.all([
     supabase.from('fm_trackers').select('*').eq('id', trackerId).single(),
+    // Display entries (last N days)
     supabase.from('fm_tracker_entries').select('*').eq('tracker_id', trackerId).gte('date', startDate).order('date', { ascending: false }),
     supabase.from('fm_smoking_materials').select('*').eq('tracker_id', trackerId).order('sort_order'),
+    // All-time entries for accurate streak calculation (only date + count needed)
+    supabase.from('fm_tracker_entries').select('date, count').eq('tracker_id', trackerId).order('date', { ascending: false }),
   ])
 
   const tracker = trackerRes.data
   const entries = entriesRes.data || []
   const materials = materialsRes.data || []
+  const allEntries = allEntriesRes.data || []
 
   if (!tracker) return { data: null, error: 'Tracker nicht gefunden' }
 
   const daily = aggregateByDay(entries, startDate, endDate)
-  const streak = computeStreak(entries, parseFloat(tracker.daily_goal), tracker.goal_direction)
+  // Compute streak from ALL-TIME entries, not just last N days
+  const streak = computeStreak(allEntries, parseFloat(tracker.daily_goal), tracker.goal_direction)
   const trend = computeTrend(entries, 'week')
   const rolledCost = computeRolledCigCost(materials)
 

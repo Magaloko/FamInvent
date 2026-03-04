@@ -335,3 +335,21 @@ export async function getCollectionValue(collectionId) {
 
   return { data: total, error: null }
 }
+
+// Batch version: fetches values for multiple collections in a single DB query
+export async function getCollectionValues(collectionIds) {
+  if (!isSupabaseConfigured || !collectionIds.length) return { data: {}, error: null }
+
+  const { data: items, error } = await supabase
+    .from('fm_items')
+    .select('collection_id, value')
+    .in('collection_id', collectionIds)
+
+  const vals = {}
+  collectionIds.forEach((id) => { vals[id] = 0 })
+  ;(items || []).forEach((item) => {
+    vals[item.collection_id] = (vals[item.collection_id] || 0) + (parseFloat(item.value) || 0)
+  })
+
+  return { data: vals, error: error?.message }
+}

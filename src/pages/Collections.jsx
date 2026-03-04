@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { getCollections, createCollection, getCollectionValue } from '@/lib/api'
+import { getCollections, createCollection, getCollectionValues } from '@/lib/api'
 import { LABELS, COLLECTION_ICONS } from '@/lib/constants'
 import { Plus, FolderOpen, X } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -28,17 +28,16 @@ export default function Collections() {
     setLoading(true)
     const opts = filter !== 'all' ? { type: filter } : {}
     const { data } = await getCollections(opts)
-    setCollections(data || [])
+    const cols = data || []
+    setCollections(cols)
 
-    // Load values for each collection
-    const vals = {}
-    await Promise.all(
-      (data || []).map(async (c) => {
-        const { data: val } = await getCollectionValue(c.id)
-        vals[c.id] = val
-      })
-    )
-    setValues(vals)
+    // Batch-load all collection values in a single DB query
+    if (cols.length > 0) {
+      const { data: vals } = await getCollectionValues(cols.map((c) => c.id))
+      setValues(vals || {})
+    } else {
+      setValues({})
+    }
     setLoading(false)
   }
 

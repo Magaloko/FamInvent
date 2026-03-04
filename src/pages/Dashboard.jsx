@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let mounted = true
     async function load() {
       setLoading(true)
       const [statsRes, toysRes, logsRes, handelRes, trackerRes] = await Promise.all([
@@ -25,6 +26,7 @@ export default function Dashboard() {
         getHandelStats(),
         getTrackerStats(),
       ])
+      if (!mounted) return
       setStats(statsRes.data)
       setTopToys(toysRes.data || [])
       setRecentLogs(logsRes.data || [])
@@ -33,6 +35,7 @@ export default function Dashboard() {
       setLoading(false)
     }
     load()
+    return () => { mounted = false }
   }, [])
 
   if (loading) {

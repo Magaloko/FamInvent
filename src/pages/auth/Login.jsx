@@ -4,6 +4,16 @@ import { useAuth } from '@/lib/AuthContext'
 import { LABELS } from '@/lib/constants'
 import { LogIn, AlertCircle } from 'lucide-react'
 
+function translateError(msg) {
+  if (!msg) return 'Anmeldung fehlgeschlagen'
+  if (msg.includes('Invalid login credentials')) return 'E-Mail oder Passwort falsch'
+  if (msg.includes('Email not confirmed')) return 'E-Mail-Adresse nicht bestätigt. Bitte prüfe dein Postfach'
+  if (msg.includes('Too many requests')) return 'Zu viele Versuche. Bitte warte kurz und versuche es erneut'
+  if (msg.includes('User not found')) return 'Kein Konto mit dieser E-Mail-Adresse gefunden'
+  if (msg.includes('network') || msg.includes('fetch')) return 'Netzwerkfehler. Bitte prüfe deine Internetverbindung'
+  return msg
+}
+
 export default function Login() {
   const { signIn, isConfigured } = useAuth()
   const navigate = useNavigate()
@@ -19,7 +29,7 @@ export default function Login() {
 
     const { error } = await signIn(email, password)
     if (error) {
-      setError(error.message || 'Anmeldung fehlgeschlagen')
+      setError(translateError(error.message))
     } else {
       navigate('/')
     }
