@@ -15,6 +15,10 @@ import ProduktDetail from './pages/handel/ProduktDetail'
 import NeuerEinkauf from './pages/handel/NeuerEinkauf'
 import EinkaufDetail from './pages/handel/EinkaufDetail'
 import NeuerVerkauf from './pages/handel/NeuerVerkauf'
+import TrackerDashboard from './pages/tracker/TrackerDashboard'
+import TrackerListe from './pages/tracker/TrackerListe'
+import TrackerDetail from './pages/tracker/TrackerDetail'
+import TrackerMaterialien from './pages/tracker/TrackerMaterialien'
 
 function AuthRoute({ children }) {
   const { user, loading } = useAuth()
@@ -61,6 +65,10 @@ function AppRoutes() {
         <Route path="handel/produkte/:id/einkauf/neu" element={<NeuerEinkauf />} />
         <Route path="handel/einkauf/:id" element={<EinkaufDetail />} />
         <Route path="handel/einkauf/:purchaseId/verkauf/neu" element={<NeuerVerkauf />} />
+        <Route path="tracker" element={<TrackerDashboard />} />
+        <Route path="tracker/liste" element={<TrackerListe />} />
+        <Route path="tracker/:id" element={<TrackerDetail />} />
+        <Route path="tracker/:id/materialien" element={<TrackerMaterialien />} />
       </Route>
 
       {/* 404 */}

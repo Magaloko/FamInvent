@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getStats, getTopToys, getPlayLogs } from '@/lib/api'
 import { getHandelStats } from '@/lib/api-handel'
-import { LABELS, CHART_COLORS, HANDEL_LABELS } from '@/lib/constants'
-import { Package, FolderOpen, Euro, Clock, Plus, Gamepad2, BarChart3, ShoppingCart, TrendingUp, ArrowRight } from 'lucide-react'
+import { getTrackerStats } from '@/lib/api-tracker'
+import { LABELS, CHART_COLORS, HANDEL_LABELS, TRACKER_LABELS } from '@/lib/constants'
+import { Package, FolderOpen, Euro, Clock, Plus, Gamepad2, BarChart3, ShoppingCart, TrendingUp, TrendingDown, ArrowRight, ClipboardList } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 export default function Dashboard() {
@@ -11,21 +12,24 @@ export default function Dashboard() {
   const [topToys, setTopToys] = useState([])
   const [recentLogs, setRecentLogs] = useState([])
   const [handelStats, setHandelStats] = useState(null)
+  const [trackerStats, setTrackerStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const [statsRes, toysRes, logsRes, handelRes] = await Promise.all([
+      const [statsRes, toysRes, logsRes, handelRes, trackerRes] = await Promise.all([
         getStats(),
         getTopToys(),
         getPlayLogs({ limit: 5 }),
         getHandelStats(),
+        getTrackerStats(),
       ])
       setStats(statsRes.data)
       setTopToys(toysRes.data || [])
       setRecentLogs(logsRes.data || [])
       setHandelStats(handelRes.data)
+      setTrackerStats(trackerRes.data)
       setLoading(false)
     }
     load()
@@ -189,6 +193,40 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Tracker Summary */}
+      {trackerStats && trackerStats.trackers.length > 0 && (
+        <div className="fm-card-static p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-heading font-bold text-fm-text flex items-center gap-2">
+              <ClipboardList size={18} className="text-fm-primary" />
+              {TRACKER_LABELS.tracker}
+            </h2>
+            <Link to="/tracker" className="fm-btn-ghost text-xs flex items-center gap-1">
+              {TRACKER_LABELS.zumTracker} <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center p-3 bg-fm-bg-input rounded-card">
+              <p className="text-sm font-bold text-fm-text">{trackerStats.todayTotal}</p>
+              <p className="text-[10px] text-fm-text-muted">{TRACKER_LABELS.heute}</p>
+            </div>
+            <div className="text-center p-3 bg-fm-bg-input rounded-card">
+              <p className="text-sm font-bold text-red-500">{trackerStats.todayCost.toFixed(2)} €</p>
+              <p className="text-[10px] text-fm-text-muted">{TRACKER_LABELS.kosten}</p>
+            </div>
+            <div className="text-center p-3 bg-fm-bg-input rounded-card">
+              <div className="flex items-center justify-center gap-1">
+                {trackerStats.weekTrend <= 0 ? <TrendingDown size={14} className="text-green-600" /> : <TrendingUp size={14} className="text-red-500" />}
+                <p className={`text-sm font-bold ${trackerStats.weekTrend <= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {trackerStats.weekTrend > 0 ? '+' : ''}{trackerStats.weekTrend.toFixed(0)}%
+                </p>
+              </div>
+              <p className="text-[10px] text-fm-text-muted">{TRACKER_LABELS.wochenvergleich}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Handel Summary */}
       {handelStats && (
