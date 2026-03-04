@@ -7,7 +7,7 @@ export async function getCollections({ type } = {}) {
 
   let query = supabase
     .from('fm_collections')
-    .select('*, fm_items(count)')
+    .select('*, fm_items(id)')
     .order('created_at', { ascending: false })
 
   if (type) query = query.eq('type', type)
@@ -16,7 +16,7 @@ export async function getCollections({ type } = {}) {
 
   const collections = (data || []).map((c) => ({
     ...c,
-    itemCount: c.fm_items?.[0]?.count || 0,
+    itemCount: c.fm_items?.length || 0,
   }))
 
   return { data: collections, error: error?.message }
@@ -334,4 +334,22 @@ export async function getCollectionValue(collectionId) {
   const total = (items || []).reduce((sum, i) => sum + (parseFloat(i.value) || 0), 0)
 
   return { data: total, error: null }
+}
+
+export async function getAllCollectionValues() {
+  if (!isSupabaseConfigured) return { data: {}, error: null }
+
+  const { data: items, error } = await supabase
+    .from('fm_items')
+    .select('collection_id, value')
+
+  if (error) return { data: {}, error: error.message }
+
+  const valueMap = {}
+  ;(items || []).forEach((item) => {
+    const cid = item.collection_id
+    valueMap[cid] = (valueMap[cid] || 0) + (parseFloat(item.value) || 0)
+  })
+
+  return { data: valueMap, error: null }
 }

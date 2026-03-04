@@ -38,7 +38,7 @@ export async function getProducts({ category, search, activeOnly = true } = {}) 
   if (!isSupabaseConfigured) return { data: [], error: null }
   let query = supabase
     .from('fm_products')
-    .select('*, fm_purchases(count)')
+    .select('*, fm_purchases(id)')
     .order('created_at', { ascending: false })
   if (activeOnly) query = query.eq('is_active', true)
   if (category) query = query.eq('category', category)
@@ -46,7 +46,7 @@ export async function getProducts({ category, search, activeOnly = true } = {}) 
   const { data, error } = await query
   const products = (data || []).map((p) => ({
     ...p,
-    purchaseCount: p.fm_purchases?.[0]?.count || 0,
+    purchaseCount: p.fm_purchases?.length || 0,
   }))
   return { data: products, error: error?.message }
 }

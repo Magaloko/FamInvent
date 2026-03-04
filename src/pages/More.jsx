@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/lib/AuthContext'
-import { Gamepad2, BarChart3, LogOut, Info } from 'lucide-react'
+import { Gamepad2, BarChart3, LogOut } from 'lucide-react'
 
 export default function More() {
   const { signOut, user } = useAuth()
@@ -28,7 +28,7 @@ export default function More() {
       {/* Links */}
       <div className="space-y-2">
         {links.map((link) => (
-          <Link key={link.to} to={link.to} className="fm-card p-4 flex items-center gap-4 block">
+          <Link key={link.to} to={link.to} className="fm-card p-4 flex items-center gap-4">
             <div className={`p-2 rounded-btn bg-fm-bg-input ${link.color}`}>
               <link.icon size={20} />
             </div>

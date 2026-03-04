@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { getCollections, createCollection, getCollectionValue } from '@/lib/api'
+import { Link, useSearchParams } from 'react-router-dom'
+import { getCollections, createCollection, getAllCollectionValues } from '@/lib/api'
 import { LABELS, COLLECTION_ICONS } from '@/lib/constants'
 import { Plus, FolderOpen, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Collections() {
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [collections, setCollections] = useState([])
   const [filter, setFilter] = useState('all')
@@ -27,18 +26,12 @@ export default function Collections() {
   async function loadCollections() {
     setLoading(true)
     const opts = filter !== 'all' ? { type: filter } : {}
-    const { data } = await getCollections(opts)
-    setCollections(data || [])
-
-    // Load values for each collection
-    const vals = {}
-    await Promise.all(
-      (data || []).map(async (c) => {
-        const { data: val } = await getCollectionValue(c.id)
-        vals[c.id] = val
-      })
-    )
-    setValues(vals)
+    const [collectionsRes, valuesRes] = await Promise.all([
+      getCollections(opts),
+      getAllCollectionValues(),
+    ])
+    setCollections(collectionsRes.data || [])
+    setValues(valuesRes.data || {})
     setLoading(false)
   }
 
