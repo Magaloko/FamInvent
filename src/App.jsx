@@ -9,6 +9,12 @@ import CollectionDetail from './pages/CollectionDetail'
 import ItemPage from './pages/ItemPage'
 import PlayLog from './pages/PlayLog'
 import Statistics from './pages/Statistics'
+import HandelDashboard from './pages/handel/HandelDashboard'
+import Produkte from './pages/handel/Produkte'
+import ProduktDetail from './pages/handel/ProduktDetail'
+import NeuerEinkauf from './pages/handel/NeuerEinkauf'
+import EinkaufDetail from './pages/handel/EinkaufDetail'
+import NeuerVerkauf from './pages/handel/NeuerVerkauf'
 
 function AuthRoute({ children }) {
   const { user, loading } = useAuth()
@@ -49,6 +55,12 @@ function AppRoutes() {
         <Route path="items/:id" element={<ItemPage />} />
         <Route path="playlog" element={<PlayLog />} />
         <Route path="statistics" element={<Statistics />} />
+        <Route path="handel" element={<HandelDashboard />} />
+        <Route path="handel/produkte" element={<Produkte />} />
+        <Route path="handel/produkte/:id" element={<ProduktDetail />} />
+        <Route path="handel/produkte/:id/einkauf/neu" element={<NeuerEinkauf />} />
+        <Route path="handel/einkauf/:id" element={<EinkaufDetail />} />
+        <Route path="handel/einkauf/:purchaseId/verkauf/neu" element={<NeuerVerkauf />} />
       </Route>
 
       {/* 404 */}

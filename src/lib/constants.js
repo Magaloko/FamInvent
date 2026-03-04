@@ -188,3 +188,100 @@ export const CHART_COLORS = [
   '#FF8A65', '#4DB6AC', '#FFD54F', '#CE93D8', '#81D4FA',
   '#A5D6A7', '#F48FB1', '#FFAB91', '#80CBC4', '#FFF176',
 ]
+
+// ═══════════════════════════════════════════
+// Handel (Trading) Module
+// ═══════════════════════════════════════════
+
+export const HANDEL_LABELS = {
+  handel: 'Handel',
+  handelDashboard: 'Handels-Übersicht',
+  produkte: 'Produkte',
+  produkt: 'Produkt',
+  neuesProdukt: 'Neues Produkt',
+  produktName: 'Produktname',
+  einheit: 'Einheit',
+  mindestbestand: 'Mindestbestand',
+  aktiv: 'Aktiv',
+  inaktiv: 'Inaktiv',
+  keineProdukte: 'Noch keine Produkte angelegt',
+  einkauf: 'Einkauf',
+  einkäufe: 'Einkäufe',
+  neuerEinkauf: 'Neuer Einkauf',
+  charge: 'Charge',
+  chargenNr: 'Chargen-Nr.',
+  menge: 'Menge',
+  gesamtpreis: 'Gesamtpreis',
+  preisProEinheit: 'Preis / Einheit',
+  lieferant: 'Lieferant',
+  einkaufsdatum: 'Einkaufsdatum',
+  restbestand: 'Restbestand',
+  keineEinkäufe: 'Noch keine Einkäufe vorhanden',
+  verkauf: 'Verkauf',
+  verkäufe: 'Verkäufe',
+  neuerVerkauf: 'Neuer Verkauf',
+  käufer: 'Käufer / Händler',
+  verkaufspreis: 'Verkaufspreis',
+  verkaufsdatum: 'Verkaufsdatum',
+  keineVerkäufe: 'Noch keine Verkäufe vorhanden',
+  gewinn: 'Gewinn',
+  marge: 'Marge',
+  umsatz: 'Umsatz',
+  gewinnProMonat: 'Gewinn / Monat',
+  lagerwert: 'Lagerwert',
+  lagerbestand: 'Lagerbestand',
+  eingekauft: 'Eingekauft',
+  im_lager: 'Im Lager',
+  teilweise_verkauft: 'Teilweise verkauft',
+  ausverkauft: 'Ausverkauft',
+  storniert: 'Storniert',
+  reklamation: 'Reklamation',
+  offen: 'Offen',
+  bezahlt: 'Bezahlt',
+  geliefert: 'Geliefert',
+  abgeschlossen: 'Abgeschlossen',
+  niedrigerBestand: 'Niedriger Bestand',
+  alteCharge: 'Alte Charge',
+  alterWarnung: 'Älter als 6 Monate',
+  zumHandel: 'Zum Handel',
+  offeneVerkäufe: 'Offene Verkäufe',
+  aktiveChargen: 'Aktive Chargen',
+}
+
+export const PRODUCT_UNITS = [
+  { id: 'kg', name: 'Kilogramm (kg)', short: 'kg' },
+  { id: 'g', name: 'Gramm (g)', short: 'g' },
+  { id: 'stk', name: 'Stück', short: 'Stk.' },
+  { id: 'l', name: 'Liter (L)', short: 'L' },
+  { id: 'ml', name: 'Milliliter (ml)', short: 'ml' },
+  { id: 'pkg', name: 'Packung', short: 'Pkg.' },
+  { id: 'm', name: 'Meter (m)', short: 'm' },
+]
+
+export const PRODUCT_CATEGORIES_HANDEL = [
+  { id: 'tee', name: 'Tee', icon: '🍵' },
+  { id: 'kaffee', name: 'Kaffee', icon: '☕' },
+  { id: 'gewuerze', name: 'Gewürze', icon: '🌶️' },
+  { id: 'lebensmittel', name: 'Lebensmittel', icon: '🥫' },
+  { id: 'kosmetik', name: 'Kosmetik', icon: '🧴' },
+  { id: 'textil', name: 'Textilien', icon: '🧵' },
+  { id: 'elektronik', name: 'Elektronik', icon: '🔌' },
+  { id: 'handwerk', name: 'Handwerk', icon: '🛠️' },
+  { id: 'sonstiges', name: 'Sonstiges', icon: '📦' },
+]
+
+export const PURCHASE_STATUSES = [
+  { id: 'eingekauft', label: 'Eingekauft', color: 'bg-blue-100 text-blue-700', icon: '🛒' },
+  { id: 'im_lager', label: 'Im Lager', color: 'bg-green-100 text-green-700', icon: '📦' },
+  { id: 'teilweise_verkauft', label: 'Teilw. verkauft', color: 'bg-yellow-100 text-yellow-700', icon: '📊' },
+  { id: 'ausverkauft', label: 'Ausverkauft', color: 'bg-gray-100 text-gray-600', icon: '✅' },
+  { id: 'storniert', label: 'Storniert', color: 'bg-red-100 text-red-700', icon: '❌' },
+  { id: 'reklamation', label: 'Reklamation', color: 'bg-orange-100 text-orange-700', icon: '⚠️' },
+]
+
+export const SALE_STATUSES = [
+  { id: 'offen', label: 'Offen', color: 'bg-yellow-100 text-yellow-700', icon: '⏳' },
+  { id: 'bezahlt', label: 'Bezahlt', color: 'bg-green-100 text-green-700', icon: '💰' },
+  { id: 'geliefert', label: 'Geliefert', color: 'bg-blue-100 text-blue-700', icon: '🚚' },
+  { id: 'abgeschlossen', label: 'Abgeschlossen', color: 'bg-gray-100 text-gray-600', icon: '✅' },
+]

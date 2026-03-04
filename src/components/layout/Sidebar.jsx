@@ -1,12 +1,16 @@
 import { NavLink } from 'react-router-dom'
 import { LABELS } from '@/lib/constants'
-import { LayoutDashboard, FolderOpen, Gamepad2, BarChart3, X } from 'lucide-react'
+import { LayoutDashboard, FolderOpen, Gamepad2, BarChart3, X, ShoppingCart } from 'lucide-react'
 
 const NAV_ITEMS = [
   { to: '/', icon: LayoutDashboard, label: LABELS.dashboard },
   { to: '/collections', icon: FolderOpen, label: LABELS.collections },
   { to: '/playlog', icon: Gamepad2, label: LABELS.playLog },
   { to: '/statistics', icon: BarChart3, label: LABELS.statistics },
+]
+
+const HANDEL_NAV = [
+  { to: '/handel', icon: ShoppingCart, label: 'Handel' },
 ]
 
 export default function Sidebar({ open, onClose }) {
@@ -42,6 +46,22 @@ export default function Sidebar({ open, onClose }) {
               key={to}
               to={to}
               end={to === '/'}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `fm-sidebar-link ${isActive ? 'active' : ''}`
+              }
+            >
+              <Icon size={20} />
+              {label}
+            </NavLink>
+          ))}
+
+          <hr className="border-fm-border my-3" />
+          <p className="text-[10px] uppercase tracking-wider text-fm-text-muted px-3 mb-1">Handel</p>
+          {HANDEL_NAV.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
               onClick={onClose}
               className={({ isActive }) =>
                 `fm-sidebar-link ${isActive ? 'active' : ''}`

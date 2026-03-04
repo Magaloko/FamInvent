@@ -1,27 +1,31 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getStats, getTopToys, getPlayLogs } from '@/lib/api'
-import { LABELS, CHART_COLORS } from '@/lib/constants'
-import { Package, FolderOpen, Euro, Clock, Plus, Gamepad2, BarChart3 } from 'lucide-react'
+import { getHandelStats } from '@/lib/api-handel'
+import { LABELS, CHART_COLORS, HANDEL_LABELS } from '@/lib/constants'
+import { Package, FolderOpen, Euro, Clock, Plus, Gamepad2, BarChart3, ShoppingCart, TrendingUp, ArrowRight } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [topToys, setTopToys] = useState([])
   const [recentLogs, setRecentLogs] = useState([])
+  const [handelStats, setHandelStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const [statsRes, toysRes, logsRes] = await Promise.all([
+      const [statsRes, toysRes, logsRes, handelRes] = await Promise.all([
         getStats(),
         getTopToys(),
         getPlayLogs({ limit: 5 }),
+        getHandelStats(),
       ])
       setStats(statsRes.data)
       setTopToys(toysRes.data || [])
       setRecentLogs(logsRes.data || [])
+      setHandelStats(handelRes.data)
       setLoading(false)
     }
     load()
@@ -185,6 +189,43 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Handel Summary */}
+      {handelStats && (
+        <div className="fm-card-static p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-heading font-bold text-fm-text flex items-center gap-2">
+              <ShoppingCart size={18} className="text-fm-secondary" />
+              {HANDEL_LABELS.handel}
+            </h2>
+            <Link to="/handel" className="fm-btn-ghost text-xs flex items-center gap-1">
+              {HANDEL_LABELS.zumHandel} <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center p-3 bg-fm-bg-input rounded-card">
+              <TrendingUp size={18} className="mx-auto text-green-600 mb-1" />
+              <p className="text-sm font-bold text-fm-text">{(handelStats.monthlyProfit || 0).toFixed(2)} €</p>
+              <p className="text-[10px] text-fm-text-muted">{HANDEL_LABELS.gewinnProMonat}</p>
+            </div>
+            <div className="text-center p-3 bg-fm-bg-input rounded-card">
+              <Euro size={18} className="mx-auto text-fm-primary mb-1" />
+              <p className="text-sm font-bold text-fm-text">{(handelStats.lagerwert || 0).toFixed(2)} €</p>
+              <p className="text-[10px] text-fm-text-muted">{HANDEL_LABELS.lagerwert}</p>
+            </div>
+            <div className="text-center p-3 bg-fm-bg-input rounded-card">
+              <Package size={18} className="mx-auto text-fm-secondary mb-1" />
+              <p className="text-sm font-bold text-fm-text">{handelStats.totalActiveBatches || 0}</p>
+              <p className="text-[10px] text-fm-text-muted">{HANDEL_LABELS.aktiveChargen}</p>
+            </div>
+          </div>
+          {(handelStats.lowStock?.length > 0 || handelStats.agingBatches?.length > 0) && (
+            <p className="text-xs text-orange-600 mt-3 text-center">
+              ⚠️ {(handelStats.lowStock?.length || 0) + (handelStats.agingBatches?.length || 0)} Warnungen
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }
